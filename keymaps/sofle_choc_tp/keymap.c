@@ -10,25 +10,27 @@
 // identical to the vendor "vial" build (same layer count, matrix size,
 // macro buffer and Vial features), so the stored data is still valid: re-stamp
 // the magic for this build instead of letting via_init() reset it.
-// The re-stamp below is only safe while the EEPROM layout is byte-for-byte
-// the one the board already holds. If the vendor pin, the layer count, the
-// matrix size, or any Vial/QMK-settings feature changes, remove this hook
-// (or clear EEPROM: hold the top-left key of the left half while plugging in,
-// then load the saved .vil in Vial).
+// The re-stamp is only done when the layout marker stored in EEPROM (see
+// SCTP_LAYOUT_MARKER below) matches this build's layout, i.e. the data on the
+// board was written by a build with the identical EEPROM layout. Otherwise
+// via_init() resets as normal. Change the marker ('SCT2', ...) whenever the
+// EEPROM layout changes (layer count, matrix size, macro buffer, Vial/QMK
+// settings features, vendor pin). The first flash of a build with a new marker
+// resets the EEPROM once; load the saved .vil in Vial afterwards.
 _Static_assert(DYNAMIC_KEYMAP_LAYER_COUNT == 7, "EEPROM re-stamp assumes the vendor vial layout");
 _Static_assert(MATRIX_ROWS == 10 && MATRIX_COLS == 6, "EEPROM re-stamp assumes the vendor vial layout");
+_Static_assert(EECONFIG_USER_DATA_SIZE == 0, "layout marker uses the 4-byte EECONFIG_USER word");
+
+// Layout marker in the otherwise unused 4-byte EECONFIG_USER word. Written on
+// every boot (after via_init_kb has already read the old value).
+#define SCTP_LAYOUT_MARKER 0x53435431u  // 'SCT1': vendor vial layout, 7 layers
+
 void via_init_kb(void) {
-    if (!via_eeprom_is_valid()) {
+    if (eeconfig_is_enabled() && eeconfig_read_user() == SCTP_LAYOUT_MARKER && !via_eeprom_is_valid()) {
         via_eeprom_set_valid(true);
     }
 }
 
-// Layout marker in the otherwise unused 4-byte EECONFIG_USER word. Written on
-// every boot; a future build changes the value whenever the EEPROM layout
-// changes and re-stamps the VIA magic only when the stored marker matches.
-// This build still re-stamps unconditionally because the board holds vendor
-// "vial"-layout data with no marker yet.
-#define SCTP_LAYOUT_MARKER 0x53435431u  // 'SCT1': vendor vial layout, 7 layers
 void keyboard_post_init_user(void) {
     if (eeconfig_read_user() != SCTP_LAYOUT_MARKER) {
         eeconfig_update_user(SCTP_LAYOUT_MARKER);
@@ -36,73 +38,24 @@ void keyboard_post_init_user(void) {
 }
 
 #ifdef POINTING_DEVICE_ENABLE
-#include "drivers/sensors/azoteq_iqs5xx.h"
+// The pad driver (tp_driver.c) stamps each fresh frame with a non-zero
+// sequence number in report_id; see README.
+#ifndef MOUSE_SHARED_EP
+#    error "tp_driver uses report_id as a split sequence number; MOUSE_SHARED_EP is required"
+#endif
 
-// The Azoteq driver initialises once in pointing_device_init(). On the
-// pad-side half that runs only after the 2 s SPLIT_USB_DETECT wait, when the
-// chip is already idle and clock-stretches its replies; if init fails, the
-// driver records a failed status and azoteq_iqs5xx_get_report() returns
-// nothing until the next power cycle. A tap on the pad opens the chip's comms
-// window, which is why touching it "fixes" it. Re-run the init on the pad-side
-// half until it verifiably completed.
-// Upstream QMK (PR #25315) deliberately leaves retry to user code.
-#define TP_RETRY_INTERVAL_MS 500
-#define TP_RETRY_MAX 40  // give up after ~20 s
-
-// The readback below only distinguishes "init completed" from "chip merely
-// answering" because the chip's factory idle rates are not 10 ms.
-STATIC_ASSERT(AZOTEQ_IQS5XX_REPORT_RATE == 10, "TP readback check assumes the init report rate differs from the chip defaults");
-
-static bool     tp_ready = false;
-static uint8_t  tp_tries = 0;
-static uint32_t tp_timer = 0;
-
-static bool tp_rate_is_set(azoteq_iqs5xx_charging_modes_t mode) {
-    azoteq_iqs5xx_report_rate_t rate = {0};
-    if (azoteq_iqs5xx_get_report_rate(&rate, mode, true) != I2C_STATUS_SUCCESS) {
-        return false;
-    }
-    // set_report_rate() writes the high byte first; get_report_rate() returns the raw bytes.
-    uint16_t ms = AZOTEQ_IQS5XX_COMBINE_H_L_BYTES(rate.h, rate.l);
-    return ms == AZOTEQ_IQS5XX_REPORT_RATE;
-}
-
-void housekeeping_task_user(void) {
-    if (tp_ready || tp_tries >= TP_RETRY_MAX) {
-        return;
-    }
-    // Same side selection as pointing_device_init() in quantum/pointing_device/pointing_device.c
-    // (POINTING_DEVICE_THIS_SIDE with POINTING_DEVICE_RIGHT): the pad is on the right half.
-    if (is_keyboard_left()) {
-        return;
-    }
-    if (timer_elapsed32(tp_timer) < TP_RETRY_INTERVAL_MS) {
-        return;
-    }
-    tp_timer = timer_read32();
-
-    if (tp_tries++ == 0) {
-        // The driver's init may already have failed and there is no public getter for
-        // its status; re-running it recomputes the status from scratch and costs
-        // about 110 ms once at boot.
-        azoteq_iqs5xx_init();
-        return;
-    }
-    // Init writes REPORT_RATE (10 ms) to the IDLE and IDLE_TOUCH registers; read them back.
-    if (tp_rate_is_set(AZOTEQ_IQS5XX_IDLE) && tp_rate_is_set(AZOTEQ_IQS5XX_IDLE_TOUCH)) {
-        tp_ready = true;
-        return;
-    }
-    azoteq_iqs5xx_init();
-}
-
-// Natural (macOS-style) scrolling: content follows the fingers. The Azoteq
-// driver copies the raw gesture delta into v/h; flip both here, on the master,
-// so macOS can stay on its default "natural" mouse setting.
 report_mouse_t pointing_device_task_user(report_mouse_t mouse_report) {
-    // Clamp first: -(-128) would wrap in int8.
-    mouse_report.v = (mouse_report.v == INT8_MIN) ? INT8_MAX : -mouse_report.v;
-    mouse_report.h = (mouse_report.h == INT8_MIN) ? INT8_MAX : -mouse_report.h;
+#ifdef TP_SEQ_DEDUP
+    static uint8_t last_seq = 0;
+    if (mouse_report.report_id == last_seq) {
+        // Same slave frame sampled again: drop motion/scroll, keep buttons (they are levels).
+        mouse_report.x = mouse_report.y = 0;
+        mouse_report.h = mouse_report.v = 0;
+    }
+    last_seq = mouse_report.report_id;
+#endif
+    mouse_report.report_id = 0;
+    // Natural scrolling is applied on the slave, in tp_driver.c.
     return mouse_report;
 }
 #endif // POINTING_DEVICE_ENABLE

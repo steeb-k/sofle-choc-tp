@@ -1,16 +1,26 @@
 # sofle-choc-tp
 
-A small QMK/Vial overlay for a Sofle Choc 2.1 (RP2040-CE controllers, built with `CONVERT_TO=rp2040_ce`) with an Azoteq IQS5xx trackpad on the right half and USB on the left half. It adds a custom keymap, `sofle_choc_tp`, on top of a pinned checkout of KeyboardHoarders/vial-qmk (commit 9530b49), which `build.sh` clones into `vendor/`. The keymap is a copy of the vendor `vial` keymap (7 layers) with three firmware changes.
+A small QMK/Vial overlay for a Sofle Choc 2.1 (RP2040-CE controllers, built with `CONVERT_TO=rp2040_ce`) with an Azoteq IQS5xx trackpad on the right half and USB on the left half. It adds a custom keymap, `sofle_choc_tp`, on top of a pinned checkout of KeyboardHoarders/vial-qmk (commit 9530b49), which `build.sh` clones into `vendor/`. The keymap is a copy of the vendor `vial` keymap (7 layers) with the firmware changes below.
 
 How we know it is `vial`: a picotool full-flash image of the shipped firmware matched the `vial` build byte-for-byte, while `vialtrack` matched about 7%.
 
 ## What changed
 
-Trackpad init retry. The Azoteq driver initialises once at boot and never retries. On the pad-side half that init only runs after the 2 s USB-detect wait, by which time the chip is idle and clock-stretches its replies until its next cycle ends; the vendor's 3 ms I2C timeout cut those off, leaving the pad dead until the next power cycle. The timeout is now 50 ms, and the keymap re-runs the init and verifies it by reading back the report rates the init sets, every 500 ms for up to 20 seconds. Tapping the pad within those 20 seconds also opens the chip's comms window and rescues it.
+Own pointing driver. `tp_driver.c` is a `POINTING_DEVICE_DRIVER = custom` driver that reproduces the vendor Azoteq report logic (taps, two-finger tap, scroll, movement) but wraps the vendor driver's I2C helpers (`drivers/sensors/azoteq_iqs5xx.c` is still linked, only its helper functions are used). It owns the init retry and polls the chip at most once per 10 ms report period.
 
-Natural scrolling. The scroll deltas from the pad are negated on the master in `pointing_device_task_user`, so macOS can stay on its default natural setting.
+Trackpad init retry. The Azoteq driver initialises once at boot and never retries. On the pad-side half that init only runs after the 2 s USB-detect wait, by which time the chip is idle and clock-stretches its replies until its next cycle ends; the vendor's 3 ms I2C timeout cut those off, leaving the pad dead until the next power cycle. The timeout is now 50 ms, and `tp_driver.c` re-runs the init and verifies it by reading back the report rates the init sets, every 500 ms for up to 20 seconds. Tapping the pad within those 20 seconds also opens the chip's comms window and rescues it.
 
-EEPROM preservation. Vial normally treats every new build as a different firmware (the EEPROM magic derives from a random BUILD_ID) and wipes the dynamic keymap, macros and Vial data. Because this keymap keeps the same EEPROM layout as `vial` (7 layers, same matrix, same features), `via_init_kb()` re-stamps the magic instead, so the layout stored via Vial survives the reflash. This build also writes a layout marker (`SCTP_LAYOUT_MARKER`) into the unused EECONFIG_USER word on every boot; the next build will make the re-stamp conditional on that marker matching, so a layout change cannot silently reuse incompatible data.
+Sequence number and dedup. The master polls the slave (which holds the pad) roughly every 1 ms, but the chip produces a frame only every 10 ms. Without help, the master either samples the same frame twice (doubled scroll and motion) or, when throttled to the chip's period, can skip a frame (jittery scroll, missed taps). The driver stamps every fresh frame with a non-zero sequence number in the otherwise unused `report_id` field of the split mouse report. `pointing_device_task_user` on the master samples every scan (`POINTING_DEVICE_TASK_THROTTLE_MS 1`), zeroes motion and scroll when it sees a sequence number it already consumed (buttons are kept, they are levels), and clears `report_id` before the report goes to the host. Requires `MOUSE_SHARED_EP` (the default); the build fails otherwise. `TP_SEQ_DEDUP` in `config.h` switches the dedup off.
+
+Firmware gestures (build 2). The chip's tap, two-finger-tap and press-and-hold gestures are disabled in `config.h` (swipe and zoom stay off, the chip's scroll gesture stays on); `tp_gesture()` in `tp_driver.c` decides everything else from the chip's per-frame finger count and relative/absolute position. Measured on the board (chip IQS572, 1024x1024 units over 43x40 mm, about 24 units/mm): deliberate taps last 90-155 ms (median 130) with drift up to 26 units, so the chip's 110 ms tap window missed most of them; its press-and-hold never arms on press-and-move and does arm on a resting finger, clicking on lift (a false click). Behaviour:
+- Tap: one finger, up within `TP_TAP_MAX_MS` and drifted less than `TP_TAP_MAX_DRIFT` units, is a left click (a tap that rolled 13-40 units still clicks). Two fingers (no wheel lines emitted, little motion, up within `TP_MULTI_TAP_MAX_MS`) is a right click; three fingers is a middle click. `TP_MULTI_TAP_MAX_MOTION` is the total relative motion allowed during a multi-finger tap. Clicks are held for `TP_CLICK_FRAMES` frames (10 ms each).
+- Dead zone: `TP_DEAD_ZONE_UNITS` (12, ~0.5 mm). The chip used to suppress motion at touchdown as part of its tap/hold gestures; now the firmware does it. The cursor does not move until the touch has drifted this far, then follows from that frame on (the suppressed delta is not replayed). Set it to 0 for no dead zone. After a multi-finger gesture, a finger left on the pad has its first two frames ignored (the count change twitches), then points normally.
+- Drag: arming needs stillness: the finger must stay within `TP_HOLD_STILL_DRIFT` (12 units, ~0.5 mm; a resting finger measured 5 in 250 ms) for `TP_HOLD_MS`. Once armed, the drag starts when the finger moves more than `TP_DRAG_START_UNITS` (16) from a reference position that is re-taken every 200 ms; resting creep measured at most 7 units per 200 ms, a real drag passes 16 easily. The left button goes down with zero motion on that frame so the host sees mouseDown before motion, and the drag lasts until lift. A finger that rests and lifts never clicks or drags.
+- Drag robustness: a drag ends only after two consecutive empty frames (one dropped frame does not release the button). Single I2C read failures keep the current buttons; after 10 consecutive failures (about 100 ms) all buttons are released and the gesture session is dropped.
+- Scroll: the chip's two-finger scroll deltas feed an accumulator, one wheel line per `TP_SCROLL_UNITS_PER_LINE` units (default 8, about 0.33 mm of travel; measured deltas were 1-2 units/frame slow and 10-36 fast; the old 1 unit = 1 line was fast but jumpy, 24 would be far too slow). Try 4, 8 or 12. Direction is natural scrolling, applied on the pad half in `tp_driver.c` (the master no longer inverts). Three or more fingers suppress scroll for the session (reserved for swipes).
+- Cursor motion is unchanged: it follows one finger immediately on touch. If that ever shows a dead zone or jitter at touchdown, the fallback is to re-enable the chip tap gesture and ignore its bit.
+
+EEPROM preservation. Vial normally treats every new build as a different firmware (the EEPROM magic derives from a random BUILD_ID) and wipes the dynamic keymap, macros and Vial data. Because this keymap keeps the same EEPROM layout as `vial` (7 layers, same matrix, same features), `via_init_kb()` re-stamps the magic instead, so the layout stored via Vial survives the reflash. The re-stamp is conditional: it only happens when the layout marker (`SCTP_LAYOUT_MARKER`, stored in the unused EECONFIG_USER word and written on every boot) matches this build's marker. Change the marker whenever the EEPROM layout changes; the next flash then resets the EEPROM as stock Vial would, and the saved .vil restores the layout. A board that has never run a marker-writing build (no marker stored) is also reset once.
 
 ## Build
 
@@ -22,6 +32,20 @@ Toolchain notes (macOS, Apple Silicon, October 2026): the Homebrew `qmk/qmk/qmk`
 
     brew tap osx-cross/arm && brew trust osx-cross/arm
     brew install osx-cross/arm/arm-none-eabi-gcc@8 osx-cross/arm/arm-none-eabi-binutils python@3.15 picotool
+
+## Measurement build
+
+    ./build.sh measure
+
+builds a variant with `TP_MEASURE=yes`: the QMK console is enabled and the right half is the master (`MASTER_RIGHT`), so it works on its own over USB. It writes `out/measure_right_half.uf2` (and a timestamped copy); `out/latest.uf2` is not touched.
+
+1. Flash `out/measure_right_half.uf2` to the RIGHT half only.
+2. Disconnect the TRRS cable and plug USB into the right half.
+3. From the project directory: `. .venv/bin/activate && qmk console`.
+4. Touch the pad. After startup it prints the chip's product number, resolution, max touches, report rates and gesture config (`TP ...` lines), then:
+   - `t=<ms since first touch> f=<fingers> x=<relx> y=<rely> g0=<hex> g1=<hex>` for every fresh frame with a finger down or a gesture bit set (g0 and g1 are the chip's gesture event bytes).
+   - `S dur=<ms> maxf=<max fingers> sumx=<sum of abs x> sumy=<sum of abs y> tap=<0/1> hold=<0/1> scr=<0/1>` once per touch, when all fingers lift.
+5. Afterwards reflash `out/latest.uf2` to the right half (and reconnect the TRRS cable).
 
 ## Before flashing
 
@@ -35,7 +59,7 @@ Toolchain notes (macOS, Apple Silicon, October 2026): the Homebrew `qmk/qmk/qmk`
 
 ## Flash
 
-Both halves get the same .uf2. On each half, double-tap the reset button to enter the bootloader; an RPI-RP2 drive appears. Drag `out/latest.uf2` onto it and the half reboots by itself.
+Both halves get the same .uf2 (`out/latest.uf2`). On each half, double-tap the reset button to enter the bootloader; an RPI-RP2 drive appears. Drag `out/latest.uf2` onto it and the half reboots by itself.
 
 ## Rollback
 
@@ -48,8 +72,15 @@ Note that the vendor keymap does not preserve EEPROM across builds, so flashing 
 ## What to test after flashing
 
 - The pad works without touching it at boot. Test 5 plug-ins, and again after the board has been unplugged for more than 30 seconds.
-- Scroll direction feels natural (content follows the fingers).
-- Taps and two-finger tap work.
+- 20 deliberate taps all click.
+- Two-finger tap is a right click; three-finger tap is a middle click.
+- Press for a quarter second, then move: drag; release ends it.
+- Slow careful pointing never starts a drag.
+- A finger resting for 10+ seconds never clicks or drags.
+- A tap does not nudge the cursor.
+- Resting a finger on the pad never clicks.
+- Scroll direction feels natural and the speed is right at 8 units per line (`TP_SCROLL_UNITS_PER_LINE` in `config.h`: try 4, 8, 12).
+- The cursor moves immediately on touch.
 - The keymap is intact (open Vial and compare with the saved .vil).
 - RGB, OLED and encoders behave as before.
 - If Vial shows a wrong or scrambled layout after flashing, the stored data did not match this build's layout; use File > Load saved layout with the .vil. If the board misbehaves badly, hold the top-left key of the left half while plugging it in (bootmagic) to clear EEPROM, then load the .vil.

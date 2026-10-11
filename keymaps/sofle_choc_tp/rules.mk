@@ -18,4 +18,10 @@ RGB_MATRIX_ENABLE = yes
 DYNAMIC_MACRO_ENABLE = yes
 
 POINTING_DEVICE_ENABLE = yes
-POINTING_DEVICE_DRIVER = azoteq_iqs5xx
+POINTING_DEVICE_DRIVER = custom
+I2C_DRIVER_REQUIRED = yes
+SRC += drivers/sensors/azoteq_iqs5xx.c tp_driver.c
+ifeq ($(strip $(TP_MEASURE)), yes)
+    CONSOLE_ENABLE = yes
+    OPT_DEFS += -DTP_MEASURE
+endif

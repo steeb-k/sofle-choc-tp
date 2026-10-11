@@ -46,7 +46,18 @@ fi
 
 ln -sfn "$ROOT/keymaps/$KM" "$ROOT/$Q/keyboards/$KB/keymaps/$KM"
 
-make -C "$Q" "$KB:$KM" CONVERT_TO=rp2040_ce -j"$(sysctl -n hw.ncpu)"
+MEASURE=0
+EXTRA=()
+if [ "${1:-}" = "measure" ]; then
+    MEASURE=1
+    EXTRA=(TP_MEASURE=yes)
+fi
+
+# The two variants share one output name and QMK does not rebuild when a make
+# variable changes, so always start from a clean object dir and no stale .uf2.
+rm -rf "$Q"/.build/*"${KB}_${KM}"* "$Q"/"${KB}_${KM}"*.uf2
+
+make -C "$Q" "$KB:$KM" CONVERT_TO=rp2040_ce ${EXTRA[@]+"${EXTRA[@]}"} -j"$(sysctl -n hw.ncpu)"
 
 UF2="$(find "$Q" -maxdepth 2 -name "${KB}_${KM}*.uf2" -not -path '*/lib/*' -print0 | xargs -0 ls -t 2>/dev/null | head -n1)"
 if [ -z "$UF2" ]; then
@@ -55,7 +66,14 @@ if [ -z "$UF2" ]; then
 fi
 
 mkdir -p out
-STAMPED="out/${KM}_rp2040_ce_$(date +%Y%m%d-%H%M).uf2"
-cp "$UF2" "$STAMPED"
-cp "$UF2" out/latest.uf2
-ls -l "$STAMPED" out/latest.uf2
+if [ "$MEASURE" = 1 ]; then
+    STAMPED="out/measure_right_half_$(date +%Y%m%d-%H%M).uf2"
+    cp "$UF2" "$STAMPED"
+    cp "$UF2" out/measure_right_half.uf2
+    ls -l "$STAMPED" out/measure_right_half.uf2
+else
+    STAMPED="out/${KM}_rp2040_ce_$(date +%Y%m%d-%H%M).uf2"
+    cp "$UF2" "$STAMPED"
+    cp "$UF2" out/latest.uf2
+    ls -l "$STAMPED" out/latest.uf2
+fi

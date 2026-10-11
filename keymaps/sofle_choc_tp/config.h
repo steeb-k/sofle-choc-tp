@@ -55,9 +55,9 @@
 #define AZOTEQ_IQS5XX_RESOLUTION_X 1400
 #define AZOTEQ_IQS5XX_RESOLUTION_Y 1400
 
-#define AZOTEQ_IQS5XX_TAP_ENABLE true
-#define AZOTEQ_IQS5XX_TWO_FINGER_TAP_ENABLE true
-#define AZOTEQ_IQS5XX_PRESS_AND_HOLD_ENABLE true
+#define AZOTEQ_IQS5XX_TAP_ENABLE false  // taps, two-finger tap and hold are done in tp_driver.c
+#define AZOTEQ_IQS5XX_TWO_FINGER_TAP_ENABLE false
+#define AZOTEQ_IQS5XX_PRESS_AND_HOLD_ENABLE false
 #define AZOTEQ_IQS5XX_SWIPE_X_ENABLE false
 #define AZOTEQ_IQS5XX_SWIPE_Y_ENABLE false
 #define AZOTEQ_IQS5XX_ZOOM_ENABLE   false
@@ -76,12 +76,37 @@
 #define AZOTEQ_IQS5XX_TIMEOUT_MS 50
 #define AZOTEQ_IQS5XX_SCROLL_INITIAL_DISTANCE 18
 
+// Firmware gesture layer (tp_driver.c)
+#define TP_TAP_MAX_MS        200   // max touch duration for a firmware tap (measured taps: 90-155 ms)
+#define TP_TAP_MAX_DRIFT     40    // units (~1.6 mm); measured tap drift <= 26
+#define TP_MULTI_TAP_MAX_MS  300   // 2- and 3-finger taps (fingers land staggered)
+#define TP_MULTI_TAP_MAX_MOTION 60 // sum of |rel x|+|rel y| allowed during a multi-finger tap
+#define TP_CLICK_FRAMES      2     // frames (10 ms each) a synthetic click is held
+#define TP_HOLD_MS           250   // press-and-hold before drag arms
+#define TP_HOLD_STILL_DRIFT  12    // units (~0.5 mm) a finger may move and still count as held still (resting: 5 in 250 ms)
+#define TP_DEAD_ZONE_UNITS   12    // no cursor motion until the touch has drifted this far
+#define TP_DRAG_START_UNITS  16    // ~0.7 mm of travel within a 200 ms window after arming starts the drag; resting creep stays below this
+#define TP_SCROLL_UNITS_PER_LINE 8  // units of finger travel per wheel line (~0.33 mm); try 4, 8, 12
+
 #define SPLIT_POINTING_ENABLE
 #define POINTING_DEVICE_RIGHT
 
+// Master drops split reports it has already seen, keyed on report_id (see tp_driver.c).
+#define TP_SEQ_DEDUP
+// The vendor header sets this to AZOTEQ_IQS5XX_REPORT_RATE + 1 only if it is
+// undefined, and it is not visible here, so define it for every translation unit.
+#ifdef TP_SEQ_DEDUP
+#    define POINTING_DEVICE_TASK_THROTTLE_MS 1  // sample the split report every scan; dedup handles repeats
+#else
+#    define POINTING_DEVICE_TASK_THROTTLE_MS 11  // AZOTEQ_IQS5XX_REPORT_RATE (10) + 1
+#endif
+
 /* Select hand configuration */
-#define MASTER_LEFT
-// #define MASTER_RIGHT
+#ifdef TP_MEASURE
+#    define MASTER_RIGHT  // measurement build: USB plugged into the right (trackpad) half, used alone
+#else
+#    define MASTER_LEFT
+#endif
 // #define EE_HANDS
 
 
