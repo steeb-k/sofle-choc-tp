@@ -63,6 +63,10 @@ Encoder tabs. `process_record_user` intercepts Left/Right coming from an encoder
 
 OLED after host sleep. Suspend turns the OLED off and wake only restores the RGB; the vendor relied on `OLED_TIMEOUT`'s activity path to turn it back on, which build 5 compiled out. `suspend_wakeup_init_user` now calls `oled_on()`, with a safety net in `oled_task_user`.
 
+## Linux (Niri + DankMaterialShell)
+
+See [docs/linux-niri-dms.md](docs/linux-niri-dms.md): what each gesture sends, the Niri binds that reproduce the macOS behaviour, and why a Linux-aware key set (QMK OS detection) is the recommended follow-up before binding the swipe keys globally.
+
 ## Host side (LinearMouse, home Mac only)
 
 `host/linearmouse.json` is a copy of `~/.config/linearmouse/linearmouse.json` (LinearMouse 0.12.0). The pad's scheme (matched by VID/PID/serial) holds:
