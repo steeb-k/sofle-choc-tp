@@ -90,7 +90,8 @@
 
 #define TP_SCROLL_BATCH_FRAMES 4   // one scroll report per 4 fresh frames (40 ms); see README
 #define TP_SCROLL_MAX_LINES_PER_REPORT 8
-#define TP_SWIPE3_MIN_UNITS  200   // three-finger swipe: travel along one axis (~8 mm) to fire
+#define TP_SWIPE3_MIN_UNITS_X 100  // three-finger swipe left/right: ~4 mm of travel; the 43 mm pad leaves little room beside three fingers
+#define TP_SWIPE3_MIN_UNITS_Y 200  // three-finger swipe up/down: ~8 mm
 #define TP_SWIPE3_MAX_MS     700   // ... and it must be reached within this long of the first touch
 
 // Three-finger swipe actions, sent by the master (keymap.c) on the swipe codes.

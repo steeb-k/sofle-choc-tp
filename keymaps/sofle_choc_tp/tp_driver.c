@@ -177,8 +177,11 @@ static void tp_retry_init(void) {
 #ifndef TP_SCROLL_MAX_LINES_PER_REPORT
 #    define TP_SCROLL_MAX_LINES_PER_REPORT 8
 #endif
-#ifndef TP_SWIPE3_MIN_UNITS
-#    define TP_SWIPE3_MIN_UNITS 200 // ~8 mm of three-finger travel along one axis
+#ifndef TP_SWIPE3_MIN_UNITS_X
+#    define TP_SWIPE3_MIN_UNITS_X 100 // ~4 mm of three-finger travel left/right
+#endif
+#ifndef TP_SWIPE3_MIN_UNITS_Y
+#    define TP_SWIPE3_MIN_UNITS_Y 200 // ~8 mm of three-finger travel up/down
 #endif
 #ifndef TP_SWIPE3_MAX_MS
 #    define TP_SWIPE3_MAX_MS 700
@@ -377,17 +380,22 @@ static void tp_gesture(const tp_meas_data_t *md, report_mouse_t *report) {
     // x while ax falls; rel is the signed delta of the absolute position.
     // Whether a falling ay is physically "up" depends on the pad mounting; it
     // is assumed to match the cursor (rel -y moves the cursor up).
-    // Only frames with exactly three fingers count, skipping the 2 frames after
-    // a count change (staggered landing / lift), and the chip reports non-zero
-    // rel during these frames because its scroll bit is set.
-    if (sess_active && sess_maxf >= 3 && n == 3 && frames_since_change >= 2) {
+    // Once three fingers have been seen, frames with two or three fingers
+    // count (a finger sliding off the edge of the 43 mm pad mid-swipe must not
+    // stop the sum; scroll is already suppressed for these sessions). The 2
+    // frames after any count change are skipped (staggered landing / lift).
+    // The chip reports non-zero rel during these frames because its scroll
+    // bit is set.
+    if (sess_active && sess_maxf >= 3 && n >= 2 && frames_since_change >= 2) {
         sess_sw_x += rx;
         sess_sw_y += ry;
     }
     if (sess_active && sess_maxf >= 3 && !sess_swipe_fired && elapsed <= TP_SWIPE3_MAX_MS) {
         int32_t axs = sess_sw_x < 0 ? -sess_sw_x : sess_sw_x;
         int32_t ays = sess_sw_y < 0 ? -sess_sw_y : sess_sw_y;
-        if (axs >= TP_SWIPE3_MIN_UNITS && axs > 2 * ays) {
+        // Horizontal travel is scarce on this pad, so left/right needs less
+        // distance and only has to beat the vertical component.
+        if (axs >= TP_SWIPE3_MIN_UNITS_X && axs > ays) {
             sess_swipe_fired = true;
             if (sess_sw_x > 0) {
                 tp_click(POINTING_DEVICE_BUTTON5);
@@ -396,7 +404,7 @@ static void tp_gesture(const tp_meas_data_t *md, report_mouse_t *report) {
                 tp_click(POINTING_DEVICE_BUTTON4);
                 TP_EV("swipe L");
             }
-        } else if (ays >= TP_SWIPE3_MIN_UNITS && ays > 2 * axs) {
+        } else if (ays >= TP_SWIPE3_MIN_UNITS_Y && ays > 2 * axs) {
             sess_swipe_fired = true;
             if (sess_sw_y < 0) {
                 tp_click(POINTING_DEVICE_BUTTON6);
