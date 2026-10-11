@@ -113,6 +113,17 @@
 #define TP_SWIPE_UP_KEY       KC_MISSION_CONTROL
 #define TP_SWIPE_DOWN_KEY     LCTL(KC_DOWN)   // App Expose
 
+// Discrete horizontal scroll while a modifier is held (build 6). LinearMouse maps
+// Option/Control + horizontal wheel to back/forward and tab switching, one action
+// per wheel tick, and a two-finger swipe produces several ticks. While one of
+// these modifiers is down the master passes a single +/-1 horizontal tick and
+// drops the rest until the pad has been quiet for TP_DISCRETE_H_GAP_MS, so one
+// swipe is one action. Vertical scroll is never limited (Cmd+vertical is pinch
+// zoom), and a horizontal tick is dropped while vertical ticks are still arriving
+// so a slightly diagonal zoom cannot fire a back/forward navigation.
+#define TP_DISCRETE_H_MODS (MOD_MASK_GUI | MOD_MASK_ALT | MOD_MASK_CTRL)
+#define TP_DISCRETE_H_GAP_MS 250
+
 #define SPLIT_POINTING_ENABLE
 #define POINTING_DEVICE_RIGHT
 

@@ -74,6 +74,21 @@ report_mouse_t pointing_device_task_user(report_mouse_t mouse_report) {
     if (edges & 0x20) tap_code16(TP_SWIPE_UP_KEY);      // BUTTON6: finger up
     if (edges & 0x40) tap_code16(TP_SWIPE_DOWN_KEY);    // BUTTON7: finger down
     mouse_report.buttons &= (uint8_t)~0x78;
+#ifdef TP_DISCRETE_H_MODS
+    {
+        static uint16_t last_h_time = 0, last_v_time = 0;
+        if (mouse_report.v != 0) {
+            last_v_time = timer_read();
+        }
+        if (mouse_report.h != 0) {
+            if (get_mods() & (TP_DISCRETE_H_MODS)) {
+                bool quiet     = timer_elapsed(last_h_time) > TP_DISCRETE_H_GAP_MS && timer_elapsed(last_v_time) > TP_DISCRETE_H_GAP_MS;
+                mouse_report.h = quiet ? (mouse_report.h > 0 ? 1 : -1) : 0;
+            }
+            last_h_time = timer_read();  // every fresh horizontal tick extends the lockout
+        }
+    }
+#endif
     mouse_report.report_id = 0;
     // Natural scrolling is applied on the slave, in tp_driver.c.
     return mouse_report;
@@ -145,6 +160,25 @@ const uint16_t PROGMEM encoder_map[][NUM_ENCODERS][2] = {
     [6] = { ENCODER_CCW_CW(_______, _______), ENCODER_CCW_CW(_______, _______) },
 };
 
+// Encoder: Ctrl + Left/Right from an encoder (right encoder on the base layer)
+// switches tabs instead of Spaces, the same Ctrl + horizontal convention as the
+// trackpad's Ctrl + sideways swipe. Only encoder events are intercepted, so the
+// real arrow keys with Ctrl still move between Spaces. Ctrl is already held, so a
+// bare Tab (or Shift+Tab) completes Ctrl+Tab / Ctrl+Shift+Tab.
+bool process_record_user(uint16_t keycode, keyrecord_t *record) {
+    if (IS_ENCODEREVENT(record->event) && record->event.pressed && (get_mods() & MOD_MASK_CTRL) && (keycode == KC_LEFT || keycode == KC_RGHT)) {
+        if (keycode == KC_LEFT) {
+            register_code(KC_LSFT);
+            tap_code(KC_TAB);
+            unregister_code(KC_LSFT);
+        } else {
+            tap_code(KC_TAB);
+        }
+        return false;
+    }
+    return true;
+}
+
 #ifdef OLED_ENABLE
 #    include "oled_name.h"
 
@@ -164,7 +198,19 @@ static const char *tp_layer_name(uint8_t layer) {
     }
 }
 
+// Host suspend turns the OLED off (suspend_power_down_quantum) and wake only
+// restores the RGB. The vendor relied on OLED_TIMEOUT's activity path to turn it
+// back on at the first keypress; with OLED_TIMEOUT 0 that path is compiled out,
+// so turn it on explicitly at wake, with a safety net in oled_task_user (the task
+// never runs while suspended, so an off panel there is always a leftover).
+void suspend_wakeup_init_user(void) {
+    oled_on();
+}
+
 bool oled_task_user(void) {
+    if (!is_oled_on()) {
+        oled_on();
+    }
     // Dim both halves' displays after TP_IDLE_MS without input (the right half
     // sees the left half's and the trackpad's activity via SPLIT_ACTIVITY_ENABLE).
     // The driver only sends the contrast command when the level changes.

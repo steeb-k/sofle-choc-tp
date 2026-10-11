@@ -53,6 +53,16 @@ then paste `layout/current_layout_keymap.c.txt` over the two arrays in `keymap.c
 
 Idle behaviour swapped. The OLED no longer blanks after 60 s (`OLED_TIMEOUT 0`); instead, after `TP_IDLE_MS` (60000) without any key, encoder or trackpad input the RGB goes dark (`RGB_MATRIX_TIMEOUT`) and both OLEDs dim to `OLED_IDLE_BRIGHTNESS` (1) in `oled_task_user()`. Any input restores both. `SPLIT_ACTIVITY_ENABLE` forwards the master's activity timestamps to the right half so both halves time out and wake together. `RGB_MATRIX_SLEEP` turns the LEDs off during USB suspend; the vendor's `RGB_DISABLE_WHEN_USB_SUSPENDED` is not read by this QMK version, so the lights previously stayed on while the host slept.
 
+## Build 6
+
+Host-side gestures via LinearMouse plus the firmware support they need.
+
+Discrete horizontal scroll. LinearMouse maps Cmd/Ctrl + horizontal wheel on the pad to back/forward and tab switching (`~/.config/linearmouse/linearmouse.json`, `buttons.mappings` with `wheel` triggers), one action per wheel tick. While a modifier in `TP_DISCRETE_H_MODS` (Cmd, Option, Ctrl) is held, the master passes a single +/-1 horizontal tick and drops the rest until the pad has produced no horizontal or vertical tick for `TP_DISCRETE_H_GAP_MS` (250), so one swipe is one action and a slightly diagonal Cmd+scroll pinch zoom cannot navigate. Vertical scroll is never limited.
+
+Encoder tabs. `process_record_user` intercepts Left/Right coming from an encoder while Ctrl is held and sends Ctrl+Tab / Ctrl+Shift+Tab instead, so Ctrl + the right encoder switches tabs like Ctrl + a sideways swipe. Real arrow keys with Ctrl still switch Spaces.
+
+OLED after host sleep. Suspend turns the OLED off and wake only restores the RGB; the vendor relied on `OLED_TIMEOUT`'s activity path to turn it back on, which build 5 compiled out. `suspend_wakeup_init_user` now calls `oled_on()`, with a safety net in `oled_task_user`.
+
 ## Build
 
     ./build.sh
@@ -90,7 +100,15 @@ builds a variant with `TP_MEASURE=yes`: the QMK console is enabled and the right
 
 ## Flash
 
-Both halves get the same .uf2 (`out/latest.uf2`). On each half, double-tap the reset button to enter the bootloader; an RPI-RP2 drive appears. Drag `out/latest.uf2` onto it and the half reboots by itself.
+Flash each half the same way with the same `.uf2` (left first). Double-tap reset, wait for the `RPI-RP2` drive, then from the repo root:
+
+    diskutil unmount /Volumes/RPI-RP2 && picotool load -x out/latest.uf2
+
+`picotool` talks to the bootloader over USB directly and reboots the board (`-x`) when done. Unmounting first matters: the board drops off the bus the instant the last block lands, and if macOS still has the FAT volume open at that moment (a Finder copy, `cp` writing extended attributes, Spotlight) it can hang on the vanished disk and, on 2026-10-11, kernel-panicked 60 s later ("busy timeout ... IOMediaBSDClient"). Dragging the file onto the drive works most of the time, but the unmount-then-picotool route never leaves the volume open.
+
+If `picotool` says no device is found, the board is not in bootloader mode or the drive was already gone; double-tap reset again.
+
+Connect the TRRS cable before plugging in USB and never hot-plug it: a half-seated TRRS plug can short the power rails between the halves, and a brown-out on the USB half shows up as the QMK logo stuck on its OLED (it decided it was the slave because USB never enumerated). Unplug everything, reseat TRRS, then plug USB back in.
 
 ## Rollback
 
@@ -120,4 +138,6 @@ Note that the vendor keymap does not preserve EEPROM across builds, so flashing 
 - Left OLED shows kznjk, a rule, `Layer` and the layer name; the name changes while a layer key is held (kbd, 10key, mods, rgb).
 - Right OLED still shows the logo. RGB and encoders behave as before.
 - After a minute idle both halves' RGB go dark and both OLEDs dim; any key, encoder or pad touch restores them on both halves.
+- After the host sleeps and wakes, the OLED comes back on by itself.
+- Ctrl + right encoder switches tabs; Cmd + sideways swipe goes back/forward once per swipe; Ctrl + sideways swipe switches one tab (LinearMouse mappings).
 - If Vial shows a wrong or scrambled layout after flashing, the stored data did not match this build's layout; use File > Load saved layout with the .vil. If the board misbehaves badly, hold the top-left key of the left half while plugging it in (bootmagic) to clear EEPROM, then load the .vil.
