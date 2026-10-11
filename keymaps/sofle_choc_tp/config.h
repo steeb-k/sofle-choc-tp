@@ -126,6 +126,17 @@
 #define TP_SWIPE_UP_KEY_WIN       LGUI(KC_TAB)         // Task View
 #define TP_SWIPE_DOWN_KEY_WIN     LGUI(KC_TAB)
 
+// Build 8: scroll direction per host OS. The pad half (tp_driver.c) always
+// applies natural scrolling, which is what the Mac wanted; the master flips an
+// axis back (1) for the hosts below. On Linux the vertical direction came out
+// backwards (user-reported, 2026-10-11), so vertical is flipped there.
+// Horizontal is flipped there too (confirmed right on 2026-10-11).
+// tools/hid_watch.py prints the wheel sign per tick. Windows is a guess.
+#define TP_SCROLL_FLIP_V_LINUX  1
+#define TP_SCROLL_FLIP_H_LINUX  1
+#define TP_SCROLL_FLIP_V_WIN    0
+#define TP_SCROLL_FLIP_H_WIN    1
+
 // Discrete horizontal scroll while a modifier is held (build 6). LinearMouse maps
 // Option/Control + horizontal wheel to back/forward and tab switching, one action
 // per wheel tick, and a two-finger swipe produces several ticks. While one of
@@ -136,6 +147,15 @@
 // so a slightly diagonal zoom cannot fire a back/forward navigation.
 #define TP_DISCRETE_H_MODS (MOD_MASK_GUI | MOD_MASK_ALT | MOD_MASK_CTRL)
 #define TP_DISCRETE_H_GAP_MS 250
+
+// Build 8: on a Linux host, Ctrl + sideways swipe switches tabs from the firmware,
+// the way Ctrl + encoder already does (Ctrl is held, so a bare Tab / Shift+Tab
+// tap completes Ctrl+Tab / Ctrl+Shift+Tab), and the wheel tick is swallowed.
+// macOS keeps the wheel tick for LinearMouse. TP_CTRL_SWIPE_NEXT_TAB_H is the
+// sign of the (single, discrete) horizontal tick that means "next tab"; the
+// other sign is "previous tab" (-1 confirmed on 2026-10-11; +1 felt backwards).
+#define TP_CTRL_SWIPE_TABS_LINUX
+#define TP_CTRL_SWIPE_NEXT_TAB_H -1
 
 #define SPLIT_POINTING_ENABLE
 #define POINTING_DEVICE_RIGHT

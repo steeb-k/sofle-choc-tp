@@ -65,7 +65,11 @@ OLED after host sleep. Suspend turns the OLED off and wake only restores the RGB
 
 ## Linux (Niri + DankMaterialShell)
 
-See [docs/linux-niri-dms.md](docs/linux-niri-dms.md): what each gesture sends, the Niri binds that reproduce the macOS behaviour, and why a Linux-aware key set (QMK OS detection) is the recommended follow-up before binding the swipe keys globally.
+See [docs/linux-niri-dms.md](docs/linux-niri-dms.md): what each gesture sends on a Linux host, the Niri binds that reproduce the macOS behaviour (installed on the Linux box as `~/.config/niri/sofle.kdl`, copy in `host/niri-sofle.kdl`), the scroll-direction fix of build 8, and `tools/hid_watch.py` for checking what the board sends.
+
+## Host side (Niri, Linux)
+
+`host/niri-sofle.kdl` is a copy of `~/.config/niri/sofle.kdl`, included from `config.kdl`: the three-finger swipe binds (Super+Alt chords and XF86LaunchA to columns and the Overview). Super + sideways swipe is covered by DMS's existing Mod+WheelScroll binds; Ctrl + sideways swipe is handled in the firmware on Linux (no bind). Details in `docs/linux-niri-dms.md`.
 
 ## Host side (LinearMouse, home Mac only)
 
@@ -81,6 +85,16 @@ Known limit and the way past it: a wheel can never say "fingers still down", so 
 
 Host-OS-aware swipe keys. `OS_DETECTION_ENABLE` (QMK's USB enumeration fingerprint) lets `pointing_device_task_user` pick the three-finger swipe key set: macOS/iOS/unknown use the original Ctrl+Left/Right, Mission Control, Ctrl+Down; Linux uses Super+Alt+Left/Right/Down with the Mission Control key unchanged (`TP_SWIPE_*_KEY_LINUX`, bindable in Niri without stealing Ctrl+arrow word movement; see `docs/linux-niri-dms.md`); Windows uses Ctrl+Win+Left/Right and Win+Tab (`TP_SWIPE_*_KEY_WIN`, untested). Detection settles about a quarter second after enumeration; before that the macOS set is used. The left OLED shows the detected OS (`mac`, `linux`, `win`, `ios`, `os ?`) under the layer name. Detection runs only on the USB half and re-runs on every replug or host reboot, not on a KVM switch that keeps the device enumerated.
 
+## Build 8
+
+Scroll direction per host OS. The pad half applies natural scrolling for every host (unchanged); `pointing_device_task_user` now flips an axis back per detected OS, before the discrete-horizontal logic. Vertical came out backwards on Linux, so `TP_SCROLL_FLIP_V_LINUX 1`; horizontal likewise (`TP_SCROLL_FLIP_H_LINUX 1`), both confirmed on the Linux box; Windows mirrors Linux, untested. Set all four to 0 for build 7 behaviour.
+
+Ctrl + sideways swipe on Linux. A Niri bind cannot type into the focused app and a `wtype`-injected Tab arrives without the physically held Ctrl, so on a Linux host the firmware taps Tab / Shift+Tab itself while Ctrl is held, as the encoder does, and swallows the wheel tick (`TP_CTRL_SWIPE_TABS_LINUX`; `TP_CTRL_SWIPE_NEXT_TAB_H` picks which tick sign is "next"). macOS keeps the LinearMouse wheel-tick path.
+
+Left OLED relaid out. The name bitmap now starts on the first pixel row (`tools/make_oled_name.py`, 9 text rows, regenerated with `--reuse` so the pixels are the ones from build 4), then a blank row, a 16 px white rounded box with the detected host OS knocked out of it (`macOS`, `linux`, `win`, `ios`, `?`; bitmaps in `oled_name.h`, built from the OLED's own 6x8 font), a blank row, `Layer` and the layer name. The rule is gone. Every line is placed with `oled_set_cursor` and padded by hand (`tp_oled_line`): `oled_write_ln` on a line that exactly fills the 5 columns ("Layer", "linux", "10key") wraps to the next row and clears it with spaces, which is why on a Linux host the OS line landed on row 0 and wiped the top of the k. The generator needs Pillow (`.venv/bin/pip install pillow`) and the vendor tree (for `glcdfont.c`).
+
+Also: `build.sh` runs on Linux (distro arm-none-eabi toolchain, `nproc`), `tools/hid_watch.py` decodes what the board sends from its hidraw nodes (Linux, no root needed with the Vial udev rule), and the Niri binds are installed and copied to `host/niri-sofle.kdl`. Not yet built: this box has no ARM toolchain installed (see Build).
+
 ## Build
 
     ./build.sh
@@ -91,6 +105,13 @@ Toolchain notes (macOS, Apple Silicon, October 2026): the Homebrew `qmk/qmk/qmk`
 
     brew tap osx-cross/arm && brew trust osx-cross/arm
     brew install osx-cross/arm/arm-none-eabi-gcc@8 osx-cross/arm/arm-none-eabi-binutils python@3.15 picotool
+
+Toolchain notes (Linux, CachyOS/Arch, October 2026): the script uses whatever `arm-none-eabi-gcc` is on PATH and the system `python3` for the virtualenv. One-time setup (picotool is in the AUR; it is optional, see Flash):
+
+    sudo pacman -S arm-none-eabi-gcc arm-none-eabi-binutils arm-none-eabi-newlib
+    paru -S picotool
+
+The vendor tree is pinned to a 2024 QMK that was built with GCC 8 on the Mac; the repo GCC is 16. If the build fails on a new warning-as-error or a newer-GCC quirk, the fix is usually a `-Wno-...` in `EXTRAFLAGS` or the Arch `arm-none-eabi-gcc` of an older release from the Arch Linux Archive; note it here when it happens.
 
 ## Measurement build
 
@@ -126,6 +147,8 @@ Flash each half the same way with the same `.uf2` (left first). Double-tap reset
 
 If `picotool` says no device is found, the board is not in bootloader mode or the drive was already gone; double-tap reset again.
 
+On Linux, `picotool load -x out/latest.uf2` works the same (install from the AUR; it needs the Raspberry Pi udev rule or `sudo` to open the bootloader device). Without picotool, copy the file onto the `RPI-RP2` drive: DMS/udisks usually mounts it under `/run/media/$USER/RPI-RP2`; otherwise `udisksctl mount -b /dev/disk/by-label/RPI-RP2`. Then `cp out/latest.uf2 /run/media/$USER/RPI-RP2/ && sync`. The drive vanishes on its own when the board reboots; Linux handles that without the macOS hang.
+
 Connect the TRRS cable before plugging in USB and never hot-plug it: a half-seated TRRS plug can short the power rails between the halves, and a brown-out on the USB half shows up as the QMK logo stuck on its OLED (it decided it was the slave because USB never enumerated). Unplug everything, reseat TRRS, then plug USB back in.
 
 ## Rollback
@@ -153,10 +176,12 @@ Note that the vendor keymap does not preserve EEPROM across builds, so flashing 
 - A three-finger tap still middle-clicks.
 - A slow three-finger touch that moves less than ~8 mm does nothing.
 - The keymap is intact (open Vial and compare with the saved .vil).
-- Left OLED shows kznjk, a rule, `Layer` and the layer name; the name changes while a layer key is held (kbd, 10key, mods, rgb).
+- Left OLED shows kznjk from the very top, a white box with the host OS, `Layer` and the layer name; the name changes while a layer key is held (kbd, 10key, mods, rgb). Nothing overwrites the top of the k on Linux (`linux` and `10key` are 5-character lines).
 - Right OLED still shows the logo. RGB and encoders behave as before.
 - After a minute idle both halves' RGB go dark and both OLEDs dim; any key, encoder or pad touch restores them on both halves.
 - After the host sleeps and wakes, the OLED comes back on by itself.
-- The OLED's last line shows the detected host OS; on Linux the three-finger swipes send Super+Alt chords (bind them in Niri per docs/linux-niri-dms.md).
-- Ctrl + right encoder switches tabs; Cmd + sideways swipe goes back/forward once per swipe; Ctrl + sideways swipe switches one tab (LinearMouse mappings).
+- The OLED's white box shows the detected host OS; on Linux the three-finger swipes send Super+Alt chords (bound in Niri per docs/linux-niri-dms.md) and `python3 tools/hid_watch.py` shows them as `LGui+LAlt+Right` etc.
+- On Linux, two-finger scroll goes the same way as on the Mac on both axes (build 8 flips horizontal back; `hid_watch.py` prints the wheel sign per tick).
+- Ctrl + right encoder switches tabs; Cmd + sideways swipe goes back/forward once per swipe; Ctrl + sideways swipe switches one tab (LinearMouse mappings on the Mac, firmware taps on Linux).
+- On Linux, Ctrl + sideways swipe switches one tab per swipe with no horizontal scroll leaking through; `hid_watch.py` shows `LCtl+Tab` / `LCtl+LSft+Tab` and no wheel tick.
 - If Vial shows a wrong or scrambled layout after flashing, the stored data did not match this build's layout; use File > Load saved layout with the .vil. If the board misbehaves badly, hold the top-left key of the left half while plugging it in (bootmagic) to clear EEPROM, then load the .vil.

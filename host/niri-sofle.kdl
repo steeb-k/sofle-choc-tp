@@ -1,0 +1,24 @@
+// Sofle Choc trackpad (sofle-choc-tp firmware, build 7 or later): Niri binds
+// that give the pad's gestures the meaning they have on macOS. Hand-written,
+// not managed by DMS; included from config.kdl. A copy lives in the firmware
+// repo as host/niri-sofle.kdl, with the explanation in docs/linux-niri-dms.md.
+binds {
+    // Three-finger swipes. The firmware detects a Linux host and sends these
+    // Super+Alt chords instead of the macOS Ctrl+arrow set (which would steal
+    // word-wise cursor movement in every text field). Fingers left = the
+    // column to the right, like the next Space on the Mac.
+    Super+Alt+Right hotkey-overlay-title="Pad: three fingers left, next column" { focus-column-right; }
+    Super+Alt+Left  hotkey-overlay-title="Pad: three fingers right, previous column" { focus-column-left; }
+    // Swipe up = Mission Control key (XF86LaunchA on Linux) = Overview.
+    XF86LaunchA     hotkey-overlay-title="Pad: three fingers up, overview" { toggle-overview; }
+    // Swipe down = App Expose on the Mac; Niri has no per-app view, so the
+    // Overview again (a down swipe also closes it, as on macOS).
+    Super+Alt+Down  hotkey-overlay-title="Pad: three fingers down, overview" { toggle-overview; }
+
+    // Super + sideways swipe (one wheel tick per swipe) needs no line here:
+    // DMS already binds Mod+WheelScrollLeft/Right to focus-column-left/right.
+
+    // Ctrl + sideways swipe = previous / next tab: handled in the firmware on a
+    // Linux host (it taps Tab / Shift+Tab while Ctrl is held, like the encoder),
+    // so no bind and no key-injection helper is needed here.
+}

@@ -9,17 +9,23 @@ KM=sofle_choc_tp
 cd "$(dirname "$0")"
 ROOT="$PWD"
 
-# Toolchain: keg-only Homebrew ARM GCC, plus a project virtualenv holding the
-# qmk CLI and the vendor tree's Python requirements (the Homebrew qmk bottle
-# is broken on this macOS, so it is not used). See README for setup.
-export PATH="/opt/homebrew/opt/arm-none-eabi-gcc@8/bin:/opt/homebrew/opt/arm-none-eabi-binutils/bin:/opt/homebrew/bin:$PATH"
-if [ ! -x .venv/bin/python ]; then
-    /opt/homebrew/bin/python3.15 -m venv .venv
-    .venv/bin/python -m pip install --quiet --upgrade pip
-    .venv/bin/python -m pip install --quiet -r vendor/vial-qmk/requirements.txt qmk
+# Toolchain. macOS: keg-only Homebrew ARM GCC (the Homebrew qmk bottle is broken
+# on this macOS, so it is not used). Linux: the distro's arm-none-eabi-gcc,
+# arm-none-eabi-binutils and arm-none-eabi-newlib on PATH (pacman on CachyOS/Arch).
+# Both: a project virtualenv holding the qmk CLI and the vendor tree's Python
+# requirements. See README for setup.
+if [ "$(uname -s)" = Darwin ]; then
+    export PATH="/opt/homebrew/opt/arm-none-eabi-gcc@8/bin:/opt/homebrew/opt/arm-none-eabi-binutils/bin:/opt/homebrew/bin:$PATH"
+    PYTHON=/opt/homebrew/bin/python3.15
+    NPROC="$(sysctl -n hw.ncpu)"
+else
+    PYTHON="$(command -v python3)"
+    NPROC="$(nproc)"
 fi
-# shellcheck disable=SC1091
-. .venv/bin/activate
+if ! command -v arm-none-eabi-gcc >/dev/null; then
+    echo "ERROR: arm-none-eabi-gcc not on PATH (Linux: pacman -S arm-none-eabi-gcc arm-none-eabi-binutils arm-none-eabi-newlib)" >&2
+    exit 1
+fi
 Q=vendor/vial-qmk
 
 if [ "${1:-}" = "clean" ]; then
@@ -44,6 +50,15 @@ else
     fi
 fi
 
+# The virtualenv needs the vendor tree's requirements.txt, so it comes after the clone.
+if [ ! -x .venv/bin/python ]; then
+    "$PYTHON" -m venv .venv
+    .venv/bin/python -m pip install --quiet --upgrade pip
+    .venv/bin/python -m pip install --quiet -r "$Q/requirements.txt" qmk
+fi
+# shellcheck disable=SC1091
+. .venv/bin/activate
+
 ln -sfn "$ROOT/keymaps/$KM" "$ROOT/$Q/keyboards/$KB/keymaps/$KM"
 
 MEASURE=0
@@ -57,7 +72,7 @@ fi
 # variable changes, so always start from a clean object dir and no stale .uf2.
 rm -rf "$Q"/.build/*"${KB}_${KM}"* "$Q"/"${KB}_${KM}"*.uf2
 
-make -C "$Q" "$KB:$KM" CONVERT_TO=rp2040_ce ${EXTRA[@]+"${EXTRA[@]}"} -j"$(sysctl -n hw.ncpu)"
+make -C "$Q" "$KB:$KM" CONVERT_TO=rp2040_ce ${EXTRA[@]+"${EXTRA[@]}"} -j"$NPROC"
 
 UF2="$(find "$Q" -maxdepth 2 -name "${KB}_${KM}*.uf2" -not -path '*/lib/*' -print0 | xargs -0 ls -t 2>/dev/null | head -n1)"
 if [ -z "$UF2" ]; then

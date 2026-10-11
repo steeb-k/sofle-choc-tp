@@ -65,6 +65,22 @@ report_mouse_t pointing_device_task_user(report_mouse_t mouse_report) {
     }
     last_seq = mouse_report.report_id;
 #endif
+#ifdef OS_DETECTION_ENABLE
+    // Scroll direction per host (build 8): the pad half applies natural scrolling
+    // for every host; flip an axis back where the host should see the other
+    // direction (TP_SCROLL_FLIP_* in config.h). Runs before the discrete-h logic
+    // below, which only looks at the sign.
+    {
+        bool flip_v = false, flip_h = false;
+        switch (detected_host_os()) {
+            case OS_LINUX:   flip_v = TP_SCROLL_FLIP_V_LINUX; flip_h = TP_SCROLL_FLIP_H_LINUX; break;
+            case OS_WINDOWS: flip_v = TP_SCROLL_FLIP_V_WIN;   flip_h = TP_SCROLL_FLIP_H_WIN;   break;
+            default: break;  // macOS, iOS, or not yet known: as the pad sends it
+        }
+        if (flip_v) mouse_report.v = (int8_t)-mouse_report.v;  // never -128: the pad caps lines at +/-8
+        if (flip_h) mouse_report.h = (int8_t)-mouse_report.h;
+    }
+#endif
     // Three-finger swipes arrive from the slave as BUTTON4..7 pulses (2 frames).
     // Only rising edges act, so one pulse gives exactly one key tap even though
     // this runs every 1 ms. The bits never reach the host.
@@ -102,6 +118,20 @@ report_mouse_t pointing_device_task_user(report_mouse_t mouse_report) {
             if (get_mods() & (TP_DISCRETE_H_MODS)) {
                 bool quiet     = timer_elapsed(last_h_time) > TP_DISCRETE_H_GAP_MS && timer_elapsed(last_v_time) > TP_DISCRETE_H_GAP_MS;
                 mouse_report.h = quiet ? (mouse_report.h > 0 ? 1 : -1) : 0;
+#if defined(OS_DETECTION_ENABLE) && defined(TP_CTRL_SWIPE_TABS_LINUX)
+                // Linux host: Ctrl + sideways swipe = tab switching done here, like
+                // the encoder (config.h). The tick never reaches the host.
+                if (mouse_report.h != 0 && (get_mods() & MOD_MASK_CTRL) && detected_host_os() == OS_LINUX) {
+                    if (mouse_report.h == (TP_CTRL_SWIPE_NEXT_TAB_H)) {
+                        tap_code(KC_TAB);
+                    } else {
+                        register_code(KC_LSFT);
+                        tap_code(KC_TAB);
+                        unregister_code(KC_LSFT);
+                    }
+                    mouse_report.h = 0;
+                }
+#endif
             }
             last_h_time = timer_read();  // every fresh horizontal tick extends the lockout
         }
@@ -200,9 +230,25 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
 #ifdef OLED_ENABLE
 #    include "oled_name.h"
 
-// Left (USB) half: the name bitmap, a rule, then "Layer" and the active layer's
-// name. The right half keeps the vendor logo (oled_task_kb draws it when this
-// returns true for the slave).
+// Left (USB) half, 32 px wide = 5 characters of the 6x8 font, 16 text rows:
+// rows 0-8 the name bitmap (ink from the first pixel row), row 9 blank, rows
+// 10-11 the host-OS label (white box, from oled_name.h), row 12 blank, row 13
+// "Layer", row 14 the active layer's name. The right half keeps the vendor logo
+// (oled_task_kb draws it when this returns true for the slave).
+// Every line is positioned with oled_set_cursor and padded by hand: oled_write_ln
+// on a line that exactly fills the 5 columns ("Layer", "linux", "10key") wraps
+// to the next row and clears it with spaces, which is what used to wipe the top
+// of the name on a Linux host (the OS line ended up on row 0).
+#define TP_OLED_OS_ROW    10
+#define TP_OLED_LAYER_ROW 13
+
+static void tp_oled_line(uint8_t row, const char *s) {
+    oled_set_cursor(0, row);
+    for (uint8_t i = 0; i < oled_max_chars(); i++) {
+        oled_write_char(*s ? *s++ : ' ', false);
+    }
+}
+
 static const char *tp_layer_name(uint8_t layer) {
     switch (layer) {
         case 0: return "kbd";
@@ -236,24 +282,23 @@ bool oled_task_user(void) {
     if (!is_keyboard_master()) {
         return true;
     }
-    static const char PROGMEM rule[32] = {[0 ... 31] = 0x18};  // 2 px line in the middle of the text row
     oled_set_cursor(0, 0);
     oled_write_raw_P(oled_name_bitmap, sizeof(oled_name_bitmap));
-    oled_set_cursor(0, OLED_NAME_LINES);
-    oled_write_raw_P(rule, sizeof(rule));
-    oled_set_cursor(0, OLED_NAME_LINES + 1);
-    oled_write_ln_P(PSTR("Layer"), false);
-    oled_write_ln(tp_layer_name(get_highest_layer(layer_state | default_layer_state)), false);
+    uint8_t os_idx = OLED_OS_UNKNOWN;
 #ifdef OS_DETECTION_ENABLE
-    // Detected host OS on the next line, so a wrong guess is visible at a glance.
+    // Detected host OS in a white box, so a wrong guess is visible at a glance.
     switch (detected_host_os()) {
-        case OS_MACOS:   oled_write_ln_P(PSTR("mac"), false); break;
-        case OS_IOS:     oled_write_ln_P(PSTR("ios"), false); break;
-        case OS_LINUX:   oled_write_ln_P(PSTR("linux"), false); break;
-        case OS_WINDOWS: oled_write_ln_P(PSTR("win"), false); break;
-        default:         oled_write_ln_P(PSTR("os ?"), false); break;
+        case OS_MACOS:   os_idx = OLED_OS_MAC; break;
+        case OS_IOS:     os_idx = OLED_OS_IOS; break;
+        case OS_LINUX:   os_idx = OLED_OS_LINUX; break;
+        case OS_WINDOWS: os_idx = OLED_OS_WIN; break;
+        default:         break;
     }
 #endif
+    oled_set_cursor(0, TP_OLED_OS_ROW);
+    oled_write_raw_P(oled_os_bitmap[os_idx], sizeof(oled_os_bitmap[0]));
+    tp_oled_line(TP_OLED_LAYER_ROW, "Layer");
+    tp_oled_line(TP_OLED_LAYER_ROW + 1, tp_layer_name(get_highest_layer(layer_state | default_layer_state)));
     return false;
 }
 #endif // OLED_ENABLE
