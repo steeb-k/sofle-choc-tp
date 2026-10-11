@@ -25,3 +25,4 @@ ifeq ($(strip $(TP_MEASURE)), yes)
     CONSOLE_ENABLE = yes
     OPT_DEFS += -DTP_MEASURE
 endif
+OS_DETECTION_ENABLE = yes   # pick the swipe key set per host OS (keymap.c)

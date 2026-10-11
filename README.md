@@ -77,6 +77,10 @@ See [docs/linux-niri-dms.md](docs/linux-niri-dms.md): what each gesture sends, t
 
 Known limit and the way past it: a wheel can never say "fingers still down", so a true trackpad-like swipe with peek needs the firmware to stream touch state over the raw HID channel (it already carries Vial) to a host helper that posts phased scroll/gesture events itself. The user plans to write such a helper (possibly a LinearMouse fork); the firmware side would be a raw HID report per frame, enabled only after the helper says hello so Vial is never disturbed.
 
+## Build 7
+
+Host-OS-aware swipe keys. `OS_DETECTION_ENABLE` (QMK's USB enumeration fingerprint) lets `pointing_device_task_user` pick the three-finger swipe key set: macOS/iOS/unknown use the original Ctrl+Left/Right, Mission Control, Ctrl+Down; Linux uses Super+Alt+Left/Right/Down with the Mission Control key unchanged (`TP_SWIPE_*_KEY_LINUX`, bindable in Niri without stealing Ctrl+arrow word movement; see `docs/linux-niri-dms.md`); Windows uses Ctrl+Win+Left/Right and Win+Tab (`TP_SWIPE_*_KEY_WIN`, untested). Detection settles about a quarter second after enumeration; before that the macOS set is used. The left OLED shows the detected OS (`mac`, `linux`, `win`, `ios`, `os ?`) under the layer name. Detection runs only on the USB half and re-runs on every replug or host reboot, not on a KVM switch that keeps the device enumerated.
+
 ## Build
 
     ./build.sh
@@ -153,5 +157,6 @@ Note that the vendor keymap does not preserve EEPROM across builds, so flashing 
 - Right OLED still shows the logo. RGB and encoders behave as before.
 - After a minute idle both halves' RGB go dark and both OLEDs dim; any key, encoder or pad touch restores them on both halves.
 - After the host sleeps and wakes, the OLED comes back on by itself.
+- The OLED's last line shows the detected host OS; on Linux the three-finger swipes send Super+Alt chords (bind them in Niri per docs/linux-niri-dms.md).
 - Ctrl + right encoder switches tabs; Cmd + sideways swipe goes back/forward once per swipe; Ctrl + sideways swipe switches one tab (LinearMouse mappings).
 - If Vial shows a wrong or scrambled layout after flashing, the stored data did not match this build's layout; use File > Load saved layout with the .vil. If the board misbehaves badly, hold the top-left key of the left half while plugging it in (bootmagic) to clear EEPROM, then load the .vil.

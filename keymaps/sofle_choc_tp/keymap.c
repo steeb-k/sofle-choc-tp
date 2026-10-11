@@ -1,6 +1,9 @@
 #include QMK_KEYBOARD_H
 #include "keymap_us_international.h"
 #include "sendstring_us_international.h"
+#ifdef OS_DETECTION_ENABLE
+#    include "os_detection.h"
+#endif
 
 // Vial derives the VIA EEPROM magic from BUILD_ID, a random number generated
 // on every build (vendor/vial-qmk/util/build_id.py, appended to version.h by
@@ -69,10 +72,25 @@ report_mouse_t pointing_device_task_user(report_mouse_t mouse_report) {
     uint8_t        swipe      = mouse_report.buttons & 0x78; // bits 3..6
     uint8_t        edges      = swipe & (uint8_t)~prev_swipe;
     prev_swipe                = swipe;
-    if (edges & 0x08) tap_code16(TP_SWIPE_LEFT_KEY);  // BUTTON4: fingers moved left
-    if (edges & 0x10) tap_code16(TP_SWIPE_RIGHT_KEY); // BUTTON5: fingers moved right
-    if (edges & 0x20) tap_code16(TP_SWIPE_UP_KEY);      // BUTTON6: finger up
-    if (edges & 0x40) tap_code16(TP_SWIPE_DOWN_KEY);    // BUTTON7: finger down
+    if (edges & 0x78) {
+        uint16_t left = TP_SWIPE_LEFT_KEY, right = TP_SWIPE_RIGHT_KEY, up = TP_SWIPE_UP_KEY, down = TP_SWIPE_DOWN_KEY;
+#ifdef OS_DETECTION_ENABLE
+        switch (detected_host_os()) {
+            case OS_LINUX:
+                left = TP_SWIPE_LEFT_KEY_LINUX; right = TP_SWIPE_RIGHT_KEY_LINUX; up = TP_SWIPE_UP_KEY_LINUX; down = TP_SWIPE_DOWN_KEY_LINUX;
+                break;
+            case OS_WINDOWS:
+                left = TP_SWIPE_LEFT_KEY_WIN; right = TP_SWIPE_RIGHT_KEY_WIN; up = TP_SWIPE_UP_KEY_WIN; down = TP_SWIPE_DOWN_KEY_WIN;
+                break;
+            default:  // macOS, iOS, or not yet known
+                break;
+        }
+#endif
+        if (edges & 0x08) tap_code16(left);   // BUTTON4: fingers moved left
+        if (edges & 0x10) tap_code16(right);  // BUTTON5: fingers moved right
+        if (edges & 0x20) tap_code16(up);     // BUTTON6: fingers up
+        if (edges & 0x40) tap_code16(down);   // BUTTON7: fingers down
+    }
     mouse_report.buttons &= (uint8_t)~0x78;
 #ifdef TP_DISCRETE_H_MODS
     {
@@ -226,6 +244,16 @@ bool oled_task_user(void) {
     oled_set_cursor(0, OLED_NAME_LINES + 1);
     oled_write_ln_P(PSTR("Layer"), false);
     oled_write_ln(tp_layer_name(get_highest_layer(layer_state | default_layer_state)), false);
+#ifdef OS_DETECTION_ENABLE
+    // Detected host OS on the next line, so a wrong guess is visible at a glance.
+    switch (detected_host_os()) {
+        case OS_MACOS:   oled_write_ln_P(PSTR("mac"), false); break;
+        case OS_IOS:     oled_write_ln_P(PSTR("ios"), false); break;
+        case OS_LINUX:   oled_write_ln_P(PSTR("linux"), false); break;
+        case OS_WINDOWS: oled_write_ln_P(PSTR("win"), false); break;
+        default:         oled_write_ln_P(PSTR("os ?"), false); break;
+    }
+#endif
     return false;
 }
 #endif // OLED_ENABLE

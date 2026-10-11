@@ -112,6 +112,19 @@
 #define TP_SWIPE_RIGHT_KEY    LCTL(KC_LEFT)
 #define TP_SWIPE_UP_KEY       KC_MISSION_CONTROL
 #define TP_SWIPE_DOWN_KEY     LCTL(KC_DOWN)   // App Expose
+// Build 7: OS detection (OS_DETECTION_ENABLE) picks a key set per host. The macOS
+// set above is also used while the host is still unknown. Linux gets unused
+// Super+Alt chords (Ctrl+Left/Right would steal word movement everywhere); see
+// docs/linux-niri-dms.md for the Niri binds. Windows gets its virtual-desktop
+// shortcuts (untested). The Mission Control key is XF86LaunchA on Linux.
+#define TP_SWIPE_LEFT_KEY_LINUX   LGUI(LALT(KC_RGHT))
+#define TP_SWIPE_RIGHT_KEY_LINUX  LGUI(LALT(KC_LEFT))
+#define TP_SWIPE_UP_KEY_LINUX     KC_MISSION_CONTROL
+#define TP_SWIPE_DOWN_KEY_LINUX   LGUI(LALT(KC_DOWN))
+#define TP_SWIPE_LEFT_KEY_WIN     LCTL(LGUI(KC_RGHT))  // next virtual desktop
+#define TP_SWIPE_RIGHT_KEY_WIN    LCTL(LGUI(KC_LEFT))
+#define TP_SWIPE_UP_KEY_WIN       LGUI(KC_TAB)         // Task View
+#define TP_SWIPE_DOWN_KEY_WIN     LGUI(KC_TAB)
 
 // Discrete horizontal scroll while a modifier is held (build 6). LinearMouse maps
 // Option/Control + horizontal wheel to back/forward and tab switching, one action

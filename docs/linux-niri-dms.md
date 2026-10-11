@@ -7,7 +7,7 @@ sends and what to put in `~/.config/niri/config.kdl` to get the same behaviour.
 DankMaterialShell (DMS) needs nothing for the gestures themselves; its IPC calls
 are listed at the end for anyone who wants a gesture to open a shell panel.
 
-Verified against the firmware in this repo (build 6), the Niri wiki (binds,
+Verified against the firmware in this repo (build 7), the Niri wiki (binds,
 input, overview, 25.05+) and DMS docs (1.7). Key names can be confirmed on the
 Linux box with `wev`.
 
@@ -35,15 +35,17 @@ Linux specifics for two of those:
   editors, so a three-finger tap over a text field pastes. That is standard
   Linux behaviour, not a firmware quirk.
 
-## Recommended: a Linux-aware firmware (one small change, not done yet)
+## The firmware is Linux-aware (build 7 and later)
 
 `Ctrl+Left` and `Ctrl+Right` are word-wise cursor movement in every Linux
-editor, terminal and browser text field. A global Niri bind on them would steal
-that everywhere. The clean fix is to let the firmware emit different swipe keys
-when it detects a Linux host. QMK's `OS_DETECTION_ENABLE` fingerprints the host
-from its USB enumeration pattern (macOS, Windows, Linux) and the keymap can pick
-the key set in `pointing_device_task_user`. On macOS nothing changes; on Linux
-the swipes would send unused Super+Alt chords instead:
+editor, terminal and browser text field, so a global Niri bind on them would
+steal that everywhere. Since build 7 the firmware avoids the clash: QMK's
+`OS_DETECTION_ENABLE` fingerprints the host from its USB enumeration pattern
+and `pointing_device_task_user` picks the swipe key set accordingly. On macOS
+nothing changes; on Linux the swipes send unused Super+Alt chords. The left
+OLED's last line shows what was detected (`mac`, `linux`, `win`, `os ?`), which
+settles about a quarter second after plug-in; until then the macOS set is used.
+Detection re-runs on replug or host reboot, not on a KVM switch.
 
 | Swipe | macOS (as today) | Linux |
 |---|---|---|
@@ -52,7 +54,7 @@ the swipes would send unused Super+Alt chords instead:
 | up | `XF86LaunchA` | `XF86LaunchA` (unchanged, nothing else uses it) |
 | down | `Ctrl+Down` | `Super+Alt+Down` |
 
-Niri binds for that firmware:
+Niri binds for it:
 
 ```kdl
 binds {
@@ -94,7 +96,7 @@ Choices behind those lines:
 - `cooldown-ms` is belt and braces; the firmware already sends one tick per
   swipe while Super/Alt/Ctrl is held.
 
-## Without reflashing (works today, with a trade-off)
+## With a pre-build-7 firmware (trade-off)
 
 Bind the keys the firmware sends now. The cost is losing Ctrl+Left/Right word
 movement system-wide, which most people will not accept for long:
