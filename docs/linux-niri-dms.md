@@ -82,11 +82,9 @@ Choices behind those lines:
   list, or `focus-window-previous` to hop back to the last window.
 - **Ctrl + sideways swipe** is tab switching on the Mac via LinearMouse. Niri
   binds can only run compositor actions or spawn commands, not type keys into
-  the focused app, and a key injected by a helper such as `wtype` arrives on a
-  separate virtual keyboard without the physically held Ctrl (the app got a
-  bare Tab). So on a Linux host the firmware does it itself, exactly like the
-  Ctrl + encoder path: it taps Tab (next tab) or Shift+Tab (previous) while Ctrl
-  is held and swallows the wheel tick (`TP_CTRL_SWIPE_TABS_LINUX`,
+  the focused app, so on a Linux host the firmware does it itself, exactly like
+  the Ctrl + encoder path: it taps Tab (next tab) or Shift+Tab (previous) while
+  Ctrl is held and swallows the wheel tick (`TP_CTRL_SWIPE_TABS_LINUX`,
   `TP_CTRL_SWIPE_NEXT_TAB_H` to swap the direction). Nothing to bind, and
   Ctrl + vertical scroll (browser zoom) is untouched.
 
