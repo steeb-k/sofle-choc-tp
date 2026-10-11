@@ -88,6 +88,21 @@
 #define TP_DRAG_START_UNITS  16    // ~0.7 mm of travel within a 200 ms window after arming starts the drag; resting creep stays below this
 #define TP_SCROLL_UNITS_PER_LINE 8  // units of finger travel per wheel line (~0.33 mm); try 4, 8, 12
 
+#define TP_SCROLL_BATCH_FRAMES 4   // one scroll report per 4 fresh frames (40 ms); see README
+#define TP_SCROLL_MAX_LINES_PER_REPORT 8
+#define TP_SWIPE3_MIN_UNITS  200   // three-finger swipe: travel along one axis (~8 mm) to fire
+#define TP_SWIPE3_MAX_MS     700   // ... and it must be reached within this long of the first touch
+
+// Three-finger swipe actions, sent by the master (keymap.c) on the swipe codes.
+// Named by the direction the fingers move. Defaults emulate the macOS
+// four-finger swipes: left/right switch Spaces (fingers left = the Space to the
+// right, as with natural scrolling), up = Mission Control, down = App Expose.
+// These need the default Mission Control shortcuts enabled in System Settings.
+#define TP_SWIPE_LEFT_KEY     LCTL(KC_RGHT)
+#define TP_SWIPE_RIGHT_KEY    LCTL(KC_LEFT)
+#define TP_SWIPE_UP_KEY       KC_MISSION_CONTROL
+#define TP_SWIPE_DOWN_KEY     LCTL(KC_DOWN)   // App Expose
+
 #define SPLIT_POINTING_ENABLE
 #define POINTING_DEVICE_RIGHT
 

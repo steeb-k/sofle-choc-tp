@@ -10,10 +10,18 @@
 // identical to the vendor "vial" build (same layer count, matrix size,
 // macro buffer and Vial features), so the stored data is still valid: re-stamp
 // the magic for this build instead of letting via_init() reset it.
-// The re-stamp is only done when the layout marker stored in EEPROM (see
+// The re-stamp is done when the layout marker stored in EEPROM (see
 // SCTP_LAYOUT_MARKER below) matches this build's layout, i.e. the data on the
-// board was written by a build with the identical EEPROM layout. Otherwise
-// via_init() resets as normal. Change the marker ('SCT2', ...) whenever the
+// board was written by a build with the identical EEPROM layout, and the VIA
+// magic is not valid. The marker alone decides: do not test eeconfig_is_enabled()
+// here, because in this tree it also requires via_eeprom_is_valid(), which is
+// false on a new build until this very hook re-stamps it. A blank EEPROM has no
+// marker, so it initialises normally. A deliberate reset (bootmagic,
+// QK_CLEAR_EEPROM, Vial reset) goes through eeconfig_init(), whose
+// eeconfig_init_user() zeroes the marker, so it is not undone by this hook.
+// Order: keyboard_init() calls via_init() (-> via_init_kb()) before
+// quantum_init(), whose "if (!eeconfig_is_enabled()) eeconfig_init();" would
+// otherwise wipe everything, so the re-stamp happens first. Change the marker ('SCT2', ...) whenever the
 // EEPROM layout changes (layer count, matrix size, macro buffer, Vial/QMK
 // settings features, vendor pin). The first flash of a build with a new marker
 // resets the EEPROM once; load the saved .vil in Vial afterwards.
@@ -26,7 +34,7 @@ _Static_assert(EECONFIG_USER_DATA_SIZE == 0, "layout marker uses the 4-byte EECO
 #define SCTP_LAYOUT_MARKER 0x53435431u  // 'SCT1': vendor vial layout, 7 layers
 
 void via_init_kb(void) {
-    if (eeconfig_is_enabled() && eeconfig_read_user() == SCTP_LAYOUT_MARKER && !via_eeprom_is_valid()) {
+    if (eeconfig_read_user() == SCTP_LAYOUT_MARKER && !via_eeprom_is_valid()) {
         via_eeprom_set_valid(true);
     }
 }
@@ -54,6 +62,18 @@ report_mouse_t pointing_device_task_user(report_mouse_t mouse_report) {
     }
     last_seq = mouse_report.report_id;
 #endif
+    // Three-finger swipes arrive from the slave as BUTTON4..7 pulses (2 frames).
+    // Only rising edges act, so one pulse gives exactly one key tap even though
+    // this runs every 1 ms. The bits never reach the host.
+    static uint8_t prev_swipe = 0;
+    uint8_t        swipe      = mouse_report.buttons & 0x78; // bits 3..6
+    uint8_t        edges      = swipe & (uint8_t)~prev_swipe;
+    prev_swipe                = swipe;
+    if (edges & 0x08) tap_code16(TP_SWIPE_LEFT_KEY);  // BUTTON4: fingers moved left
+    if (edges & 0x10) tap_code16(TP_SWIPE_RIGHT_KEY); // BUTTON5: fingers moved right
+    if (edges & 0x20) tap_code16(TP_SWIPE_UP_KEY);      // BUTTON6: finger up
+    if (edges & 0x40) tap_code16(TP_SWIPE_DOWN_KEY);    // BUTTON7: finger down
+    mouse_report.buttons &= (uint8_t)~0x78;
     mouse_report.report_id = 0;
     // Natural scrolling is applied on the slave, in tp_driver.c.
     return mouse_report;

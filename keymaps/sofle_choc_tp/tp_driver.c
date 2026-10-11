@@ -171,6 +171,18 @@ static void tp_retry_init(void) {
 #ifndef TP_SCROLL_UNITS_PER_LINE
 #    define TP_SCROLL_UNITS_PER_LINE 8
 #endif
+#ifndef TP_SCROLL_BATCH_FRAMES
+#    define TP_SCROLL_BATCH_FRAMES 4 // one scroll report per this many fresh frames (10 ms each)
+#endif
+#ifndef TP_SCROLL_MAX_LINES_PER_REPORT
+#    define TP_SCROLL_MAX_LINES_PER_REPORT 8
+#endif
+#ifndef TP_SWIPE3_MIN_UNITS
+#    define TP_SWIPE3_MIN_UNITS 200 // ~8 mm of three-finger travel along one axis
+#endif
+#ifndef TP_SWIPE3_MAX_MS
+#    define TP_SWIPE3_MAX_MS 700
+#endif
 
 typedef enum { TP_IDLE, TP_PENDING, TP_MOVING, TP_ARMED, TP_DRAGGING } tp_mode_t;
 
@@ -188,6 +200,10 @@ static tp_mode_t sess_mode;
 static int16_t   acc_v, acc_h;
 static uint8_t   click_btn; // button bit index
 static uint8_t   click_frames_left;
+static int32_t   sess_sw_x, sess_sw_y; // summed rel motion over settled three-finger frames
+static bool      sess_swipe_fired;
+static int16_t   pend_v, pend_h;     // scroll lines waiting for the next batch
+static uint8_t   scroll_batch_ctr;
 
 static void tp_gesture_reset(void) {
     sess_active       = false;
@@ -216,6 +232,28 @@ static int8_t tp_scroll_axis(int16_t *acc, int16_t d) {
     return (int8_t)CONSTRAIN_HID(-out);
 }
 
+// Add new lines to a pending count; a direction reversal drops the remainder.
+static void tp_pend_add(int16_t *pend, int8_t lines) {
+    if (lines == 0) return;
+    if ((lines < 0) != (*pend < 0) && *pend != 0) *pend = 0;
+    int32_t v = (int32_t)*pend + lines;
+    *pend     = (int16_t)(v > 1000 ? 1000 : (v < -1000 ? -1000 : v));
+}
+
+static int8_t tp_pend_take(int16_t *pend) {
+    int16_t out = *pend;
+    if (out > TP_SCROLL_MAX_LINES_PER_REPORT) out = TP_SCROLL_MAX_LINES_PER_REPORT;
+    if (out < -TP_SCROLL_MAX_LINES_PER_REPORT) out = -TP_SCROLL_MAX_LINES_PER_REPORT;
+    *pend -= out;
+    return (int8_t)out;
+}
+
+static void tp_scroll_flush(report_mouse_t *report) {
+    report->v = tp_pend_take(&pend_v);
+    report->h = tp_pend_take(&pend_h);
+    sess_lines += tp_abs16(report->v) + tp_abs16(report->h);
+}
+
 // Runs on every fresh frame and produces the report. The chip's own tap, hold,
 // swipe and zoom gestures are disabled in config.h; only its scroll bit is used.
 static void tp_gesture(const tp_meas_data_t *md, report_mouse_t *report) {
@@ -236,6 +274,10 @@ static void tp_gesture(const tp_meas_data_t *md, report_mouse_t *report) {
         sess_drift1      = 0;
         sess_motion      = 0;
         sess_scroll_seen = false;
+        pend_v = pend_h = 0;
+        scroll_batch_ctr = 0;
+        sess_sw_x = sess_sw_y = 0;
+        sess_swipe_fired      = false;
         sess_mode        = TP_PENDING;
         acc_v = acc_h = 0;
 #ifdef TP_MEASURE_PRINT
@@ -315,9 +357,55 @@ static void tp_gesture(const tp_meas_data_t *md, report_mouse_t *report) {
     }
     // Scroll: exactly two fingers; three or more suppress it for the session.
     if (sess_active && scroll && n == 2 && sess_maxf < 3) {
-        report->v = tp_scroll_axis(&acc_v, ry);
-        report->h = tp_scroll_axis(&acc_h, rx);
-        sess_lines += tp_abs16(report->v) + tp_abs16(report->h);
+        tp_pend_add(&pend_v, tp_scroll_axis(&acc_v, ry));
+        tp_pend_add(&pend_h, tp_scroll_axis(&acc_h, rx));
+    }
+    // Batched emission at a steady cadence (macOS wheel acceleration keys off
+    // event density and count). The counter ticks on every fresh frame of the
+    // session, scrolling or not; empty batches send 0.
+    if (sess_active && n > 0 && ++scroll_batch_ctr >= TP_SCROLL_BATCH_FRAMES) {
+        scroll_batch_ctr = 0;
+        tp_scroll_flush(report);
+    }
+
+    // Three-finger swipe. Sign convention: rel x/y use the same sign as the
+    // cursor deltas sent for one finger (+x right, +y down on screen), so
+    // +X = finger moving right on the pad, -Y = finger moving up. Evidence
+    // (measurements/2026-10-10-right-half-measure.log, swipe sessions with
+    // maxf=3, scr=1): the sessions with sumy=569/822 show y=-17..-51 while the
+    // absolute ay falls 632 -> 43, and the sumx=524/484 sessions show negative
+    // x while ax falls; rel is the signed delta of the absolute position.
+    // Whether a falling ay is physically "up" depends on the pad mounting; it
+    // is assumed to match the cursor (rel -y moves the cursor up).
+    // Only frames with exactly three fingers count, skipping the 2 frames after
+    // a count change (staggered landing / lift), and the chip reports non-zero
+    // rel during these frames because its scroll bit is set.
+    if (sess_active && sess_maxf >= 3 && n == 3 && frames_since_change >= 2) {
+        sess_sw_x += rx;
+        sess_sw_y += ry;
+    }
+    if (sess_active && sess_maxf >= 3 && !sess_swipe_fired && elapsed <= TP_SWIPE3_MAX_MS) {
+        int32_t axs = sess_sw_x < 0 ? -sess_sw_x : sess_sw_x;
+        int32_t ays = sess_sw_y < 0 ? -sess_sw_y : sess_sw_y;
+        if (axs >= TP_SWIPE3_MIN_UNITS && axs > 2 * ays) {
+            sess_swipe_fired = true;
+            if (sess_sw_x > 0) {
+                tp_click(POINTING_DEVICE_BUTTON5);
+                TP_EV("swipe R");
+            } else {
+                tp_click(POINTING_DEVICE_BUTTON4);
+                TP_EV("swipe L");
+            }
+        } else if (ays >= TP_SWIPE3_MIN_UNITS && ays > 2 * axs) {
+            sess_swipe_fired = true;
+            if (sess_sw_y < 0) {
+                tp_click(POINTING_DEVICE_BUTTON6);
+                TP_EV("swipe U");
+            } else {
+                tp_click(POINTING_DEVICE_BUTTON7);
+                TP_EV("swipe D");
+            }
+        }
     }
 
     // Lift: decide once.
@@ -332,7 +420,7 @@ static void tp_gesture(const tp_meas_data_t *md, report_mouse_t *report) {
         } else if (sess_maxf == 2 && sess_lines == 0 && elapsed <= TP_MULTI_TAP_MAX_MS && sess_motion <= TP_MULTI_TAP_MAX_MOTION) {
             tp_click(POINTING_DEVICE_BUTTON2);
             TP_EV("click2");
-        } else if (sess_maxf == 3 && sess_lines == 0 && elapsed <= TP_MULTI_TAP_MAX_MS && sess_motion <= TP_MULTI_TAP_MAX_MOTION) {
+        } else if (sess_maxf == 3 && !sess_swipe_fired && sess_lines == 0 && elapsed <= TP_MULTI_TAP_MAX_MS && sess_motion <= TP_MULTI_TAP_MAX_MOTION) {
             tp_click(POINTING_DEVICE_BUTTON3);
             TP_EV("click3");
         } // maxf == 1 && ARMED: a resting finger, no click
@@ -340,6 +428,9 @@ static void tp_gesture(const tp_meas_data_t *md, report_mouse_t *report) {
         static const char *const mode_names[] = {"idle", "pending", "moving", "armed", "drag"};
         uprintf("S dur=%u maxf=%u motion=%u drift=%d scr=%u mode=%s\n", (unsigned)elapsed, (unsigned)sess_maxf, (unsigned)sess_motion, (int)sess_drift1, (unsigned)sess_scroll_seen, mode_names[sess_mode]);
 #endif
+        tp_scroll_flush(report); // do not lose the tail
+        pend_v = pend_h = 0;
+        scroll_batch_ctr = 0;
         sess_active = false;
         sess_mode   = TP_IDLE;
         acc_v = acc_h = 0;
