@@ -37,6 +37,18 @@ The defaults emulate the macOS four-finger swipes and rely on the default Missio
 
 EEPROM hook fix. Build 2's `via_init_kb()` tested `eeconfig_is_enabled()`, which in this tree also requires `via_eeprom_is_valid()`. On a new build that is false until this very hook re-stamps it, so the condition could never be true and the stored layout was wiped on flashing. The condition is now only `eeconfig_read_user() == SCTP_LAYOUT_MARKER && !via_eeprom_is_valid()`. A blank EEPROM has no marker and initialises normally; a deliberate reset (bootmagic, `QK_CLEAR_EEPROM`, Vial reset) runs `eeconfig_init`, which zeroes the marker. `via_init()` runs before `quantum_init()` in `keyboard_init()`, so the re-stamp happens first. Note the build-2 flash that wiped the layout also wrote the marker, so the next flash of build 3 should preserve the layout (load the .vil once after the build-2 wipe first).
 
+## Build 4
+
+OLED and baked-in layout; the trackpad code is unchanged.
+
+Left OLED. `oled_task_user()` in `keymap.c` takes over the master display: "kznjk" rotated down the top 96 px (`oled_name.h`, a 32x96 bitmap in the driver's vertical-byte format), a 2 px rule, then `Layer` and the active layer's name (`tp_layer_name()`: 0 kbd, 1 10key, 2 mods, 3 rgb, 4-6 L4-L6). The right half keeps the vendor logo. The vendor's Caps Lock line and Qwrt/Clmk/Lower/Raise labels are gone. The 60 s OLED sleep is unchanged. To change the word or font, run `.venv/bin/python tools/make_oled_name.py --text ... [--font path --size N --rotate 90|-90]`; it rewrites `oled_name.h` and `layout/oled_preview.png`, then rebuild.
+
+Baked layout. `keymaps[]` and `encoder_map[]` are now the layout that was on the board on 2026-10-11, read over the Vial protocol with `tools/dump_layout.py` (read-only; it refuses to send any set/reset command). Vial's EEPROM copy still wins day to day and the `via_init_kb` re-stamp still preserves it across flashes; the baked copy is what a bootmagic/EEPROM reset or a Vial "reset" comes back to, so a reset no longer lands on the seller's layout. Re-dump after changing the layout in Vial:
+
+    DYLD_FALLBACK_LIBRARY_PATH=/opt/homebrew/lib .venv/bin/python tools/dump_layout.py
+
+then paste `layout/current_layout_keymap.c.txt` over the two arrays in `keymap.c`. The dump also covers macros, tap dances, combos, key overrides and QMK settings (`layout/current_layout.json`); all were empty on 2026-10-11, so nothing else is baked in.
+
 ## Build
 
     ./build.sh
@@ -101,5 +113,6 @@ Note that the vendor keymap does not preserve EEPROM across builds, so flashing 
 - A three-finger tap still middle-clicks.
 - A slow three-finger touch that moves less than ~8 mm does nothing.
 - The keymap is intact (open Vial and compare with the saved .vil).
-- RGB, OLED and encoders behave as before.
+- Left OLED shows kznjk, a rule, `Layer` and the layer name; the name changes while a layer key is held (kbd, 10key, mods, rgb).
+- Right OLED still shows the logo. RGB and encoders behave as before.
 - If Vial shows a wrong or scrambled layout after flashing, the stored data did not match this build's layout; use File > Load saved layout with the .vil. If the board misbehaves badly, hold the top-left key of the left half while plugging it in (bootmagic) to clear EEPROM, then load the .vil.

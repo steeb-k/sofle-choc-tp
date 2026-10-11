@@ -1,0 +1,3424 @@
+{
+ "via_protocol": 9,
+ "vial_protocol": 6,
+ "vial_keyboard_uid": "a7a79c4ce0b8008d",
+ "vial_definition_size": 664,
+ "vial_unlocked": 0,
+ "layer_count": 7,
+ "matrix": {
+  "rows": 10,
+  "cols": 6
+ },
+ "encoder_count": 2,
+ "counts": {
+  "macros": 16,
+  "tap_dance": 32,
+  "combo": 32,
+  "key_override": 32,
+  "alt_repeat_key": 32,
+  "macro_buffer_bytes": 1967,
+  "feature_flags": 3
+ },
+ "keymap": [
+  [
+   [
+    53,
+    30,
+    31,
+    32,
+    33,
+    34
+   ],
+   [
+    41,
+    20,
+    26,
+    8,
+    21,
+    23
+   ],
+   [
+    43,
+    4,
+    22,
+    7,
+    9,
+    10
+   ],
+   [
+    225,
+    29,
+    27,
+    6,
+    25,
+    5
+   ],
+   [
+    21025,
+    226,
+    224,
+    40,
+    227,
+    168
+   ],
+   [
+    45,
+    39,
+    38,
+    37,
+    36,
+    35
+   ],
+   [
+    42,
+    19,
+    18,
+    12,
+    24,
+    28
+   ],
+   [
+    52,
+    51,
+    15,
+    14,
+    13,
+    11
+   ],
+   [
+    49,
+    56,
+    55,
+    54,
+    16,
+    17
+   ],
+   [
+    3883,
+    230,
+    228,
+    44,
+    21027,
+    30786
+   ]
+  ],
+  [
+   [
+    53,
+    30,
+    31,
+    32,
+    33,
+    34
+   ],
+   [
+    41,
+    20,
+    26,
+    9,
+    19,
+    10
+   ],
+   [
+    43,
+    4,
+    21,
+    22,
+    23,
+    7
+   ],
+   [
+    225,
+    29,
+    27,
+    6,
+    25,
+    5
+   ],
+   [
+    227,
+    226,
+    224,
+    1,
+    40,
+    168
+   ],
+   [
+    46,
+    48,
+    47,
+    84,
+    85,
+    84
+   ],
+   [
+    76,
+    51,
+    85,
+    97,
+    96,
+    95
+   ],
+   [
+    52,
+    18,
+    86,
+    94,
+    93,
+    92
+   ],
+   [
+    229,
+    56,
+    87,
+    91,
+    90,
+    89
+   ],
+   [
+    88,
+    88,
+    99,
+    98,
+    88,
+    0
+   ]
+  ],
+  [
+   [
+    1,
+    58,
+    59,
+    60,
+    61,
+    62
+   ],
+   [
+    53,
+    30,
+    31,
+    32,
+    33,
+    34
+   ],
+   [
+    1,
+    542,
+    543,
+    544,
+    545,
+    546
+   ],
+   [
+    1,
+    46,
+    45,
+    558,
+    559,
+    560
+   ],
+   [
+    1,
+    1,
+    1,
+    1,
+    1,
+    1
+   ],
+   [
+    68,
+    67,
+    66,
+    65,
+    64,
+    63
+   ],
+   [
+    69,
+    39,
+    38,
+    37,
+    36,
+    35
+   ],
+   [
+    561,
+    551,
+    550,
+    549,
+    548,
+    547
+   ],
+   [
+    1,
+    49,
+    563,
+    51,
+    48,
+    47
+   ],
+   [
+    1,
+    1,
+    1,
+    1,
+    1,
+    1
+   ]
+  ],
+  [
+   [
+    1,
+    1,
+    1,
+    1,
+    1,
+    1
+   ],
+   [
+    1,
+    73,
+    70,
+    101,
+    0,
+    0
+   ],
+   [
+    1,
+    226,
+    224,
+    225,
+    0,
+    57
+   ],
+   [
+    1,
+    122,
+    123,
+    124,
+    125,
+    0
+   ],
+   [
+    1,
+    1,
+    1,
+    1,
+    1,
+    30787
+   ],
+   [
+    1,
+    1,
+    1,
+    1,
+    1,
+    1
+   ],
+   [
+    42,
+    1,
+    1,
+    82,
+    1,
+    75
+   ],
+   [
+    42,
+    76,
+    79,
+    81,
+    80,
+    78
+   ],
+   [
+    1,
+    0,
+    1,
+    0,
+    1,
+    0
+   ],
+   [
+    1,
+    1,
+    1,
+    1,
+    1,
+    30788
+   ]
+  ],
+  [
+   [
+    1,
+    1,
+    1,
+    1,
+    1,
+    1
+   ],
+   [
+    1,
+    1,
+    1,
+    1,
+    1,
+    1
+   ],
+   [
+    1,
+    1,
+    1,
+    1,
+    1,
+    1
+   ],
+   [
+    1,
+    1,
+    1,
+    1,
+    1,
+    1
+   ],
+   [
+    1,
+    1,
+    1,
+    1,
+    1,
+    1
+   ],
+   [
+    1,
+    1,
+    1,
+    1,
+    1,
+    1
+   ],
+   [
+    1,
+    1,
+    1,
+    1,
+    1,
+    1
+   ],
+   [
+    1,
+    1,
+    1,
+    1,
+    1,
+    1
+   ],
+   [
+    1,
+    1,
+    1,
+    1,
+    1,
+    1
+   ],
+   [
+    1,
+    1,
+    1,
+    1,
+    1,
+    1
+   ]
+  ],
+  [
+   [
+    1,
+    1,
+    1,
+    1,
+    1,
+    1
+   ],
+   [
+    1,
+    1,
+    1,
+    1,
+    1,
+    1
+   ],
+   [
+    1,
+    1,
+    1,
+    1,
+    1,
+    1
+   ],
+   [
+    1,
+    1,
+    1,
+    1,
+    1,
+    1
+   ],
+   [
+    1,
+    1,
+    1,
+    1,
+    1,
+    1
+   ],
+   [
+    1,
+    1,
+    1,
+    1,
+    1,
+    1
+   ],
+   [
+    1,
+    1,
+    1,
+    1,
+    1,
+    1
+   ],
+   [
+    1,
+    1,
+    1,
+    1,
+    1,
+    1
+   ],
+   [
+    1,
+    1,
+    1,
+    1,
+    1,
+    1
+   ],
+   [
+    1,
+    1,
+    1,
+    1,
+    1,
+    1
+   ]
+  ],
+  [
+   [
+    1,
+    1,
+    1,
+    1,
+    1,
+    1
+   ],
+   [
+    1,
+    1,
+    1,
+    1,
+    1,
+    1
+   ],
+   [
+    1,
+    1,
+    1,
+    1,
+    1,
+    1
+   ],
+   [
+    1,
+    1,
+    1,
+    1,
+    1,
+    1
+   ],
+   [
+    1,
+    1,
+    1,
+    1,
+    1,
+    1
+   ],
+   [
+    1,
+    1,
+    1,
+    1,
+    1,
+    1
+   ],
+   [
+    1,
+    1,
+    1,
+    1,
+    1,
+    1
+   ],
+   [
+    1,
+    1,
+    1,
+    1,
+    1,
+    1
+   ],
+   [
+    1,
+    1,
+    1,
+    1,
+    1,
+    1
+   ],
+   [
+    1,
+    1,
+    1,
+    1,
+    1,
+    1
+   ]
+  ]
+ ],
+ "keymap_names": [
+  [
+   [
+    "KC_GRV",
+    "KC_1",
+    "KC_2",
+    "KC_3",
+    "KC_4",
+    "KC_5"
+   ],
+   [
+    "KC_ESC",
+    "KC_Q",
+    "KC_W",
+    "KC_E",
+    "KC_R",
+    "KC_T"
+   ],
+   [
+    "KC_TAB",
+    "KC_A",
+    "KC_S",
+    "KC_D",
+    "KC_F",
+    "KC_G"
+   ],
+   [
+    "KC_LSFT",
+    "KC_Z",
+    "KC_X",
+    "KC_C",
+    "KC_V",
+    "KC_B"
+   ],
+   [
+    "MO(1)",
+    "KC_LALT",
+    "KC_LCTL",
+    "KC_ENT",
+    "KC_LGUI",
+    "KC_MUTE"
+   ],
+   [
+    "KC_MINS",
+    "KC_0",
+    "KC_9",
+    "KC_8",
+    "KC_7",
+    "KC_6"
+   ],
+   [
+    "KC_BSPC",
+    "KC_P",
+    "KC_O",
+    "KC_I",
+    "KC_U",
+    "KC_Y"
+   ],
+   [
+    "KC_QUOT",
+    "KC_SCLN",
+    "KC_L",
+    "KC_K",
+    "KC_J",
+    "KC_H"
+   ],
+   [
+    "KC_BSLS",
+    "KC_SLSH",
+    "KC_DOT",
+    "KC_COMM",
+    "KC_M",
+    "KC_N"
+   ],
+   [
+    "HYPR(KC_TAB)",
+    "KC_RALT",
+    "KC_RCTL",
+    "KC_SPC",
+    "MO(3)",
+    "RM_TOGG"
+   ]
+  ],
+  [
+   [
+    "KC_GRV",
+    "KC_1",
+    "KC_2",
+    "KC_3",
+    "KC_4",
+    "KC_5"
+   ],
+   [
+    "KC_ESC",
+    "KC_Q",
+    "KC_W",
+    "KC_F",
+    "KC_P",
+    "KC_G"
+   ],
+   [
+    "KC_TAB",
+    "KC_A",
+    "KC_R",
+    "KC_S",
+    "KC_T",
+    "KC_D"
+   ],
+   [
+    "KC_LSFT",
+    "KC_Z",
+    "KC_X",
+    "KC_C",
+    "KC_V",
+    "KC_B"
+   ],
+   [
+    "KC_LGUI",
+    "KC_LALT",
+    "KC_LCTL",
+    "_______",
+    "KC_ENT",
+    "KC_MUTE"
+   ],
+   [
+    "KC_EQL",
+    "KC_RBRC",
+    "KC_LBRC",
+    "KC_PSLS",
+    "KC_PAST",
+    "KC_PSLS"
+   ],
+   [
+    "KC_DEL",
+    "KC_SCLN",
+    "KC_PAST",
+    "KC_P9",
+    "KC_P8",
+    "KC_P7"
+   ],
+   [
+    "KC_QUOT",
+    "KC_O",
+    "KC_PMNS",
+    "KC_P6",
+    "KC_P5",
+    "KC_P4"
+   ],
+   [
+    "KC_RSFT",
+    "KC_SLSH",
+    "KC_PPLS",
+    "KC_P3",
+    "KC_P2",
+    "KC_P1"
+   ],
+   [
+    "KC_PENT",
+    "KC_PENT",
+    "KC_PDOT",
+    "KC_P0",
+    "KC_PENT",
+    "KC_NO"
+   ]
+  ],
+  [
+   [
+    "_______",
+    "KC_F1",
+    "KC_F2",
+    "KC_F3",
+    "KC_F4",
+    "KC_F5"
+   ],
+   [
+    "KC_GRV",
+    "KC_1",
+    "KC_2",
+    "KC_3",
+    "KC_4",
+    "KC_5"
+   ],
+   [
+    "_______",
+    "LSFT(KC_1)",
+    "LSFT(KC_2)",
+    "LSFT(KC_3)",
+    "LSFT(KC_4)",
+    "LSFT(KC_5)"
+   ],
+   [
+    "_______",
+    "KC_EQL",
+    "KC_MINS",
+    "LSFT(KC_EQL)",
+    "LSFT(KC_LBRC)",
+    "LSFT(KC_RBRC)"
+   ],
+   [
+    "_______",
+    "_______",
+    "_______",
+    "_______",
+    "_______",
+    "_______"
+   ],
+   [
+    "KC_F11",
+    "KC_F10",
+    "KC_F9",
+    "KC_F8",
+    "KC_F7",
+    "KC_F6"
+   ],
+   [
+    "KC_F12",
+    "KC_0",
+    "KC_9",
+    "KC_8",
+    "KC_7",
+    "KC_6"
+   ],
+   [
+    "LSFT(KC_BSLS)",
+    "LSFT(KC_0)",
+    "LSFT(KC_9)",
+    "LSFT(KC_8)",
+    "LSFT(KC_7)",
+    "LSFT(KC_6)"
+   ],
+   [
+    "_______",
+    "KC_BSLS",
+    "LSFT(KC_SCLN)",
+    "KC_SCLN",
+    "KC_RBRC",
+    "KC_LBRC"
+   ],
+   [
+    "_______",
+    "_______",
+    "_______",
+    "_______",
+    "_______",
+    "_______"
+   ]
+  ],
+  [
+   [
+    "_______",
+    "_______",
+    "_______",
+    "_______",
+    "_______",
+    "_______"
+   ],
+   [
+    "_______",
+    "KC_INS",
+    "KC_PSCR",
+    "KC_APP",
+    "KC_NO",
+    "KC_NO"
+   ],
+   [
+    "_______",
+    "KC_LALT",
+    "KC_LCTL",
+    "KC_LSFT",
+    "KC_NO",
+    "KC_CAPS"
+   ],
+   [
+    "_______",
+    "KC_UNDO",
+    "KC_CUT",
+    "KC_COPY",
+    "KC_PSTE",
+    "KC_NO"
+   ],
+   [
+    "_______",
+    "_______",
+    "_______",
+    "_______",
+    "_______",
+    "RM_NEXT"
+   ],
+   [
+    "_______",
+    "_______",
+    "_______",
+    "_______",
+    "_______",
+    "_______"
+   ],
+   [
+    "KC_BSPC",
+    "_______",
+    "_______",
+    "KC_UP",
+    "_______",
+    "KC_PGUP"
+   ],
+   [
+    "KC_BSPC",
+    "KC_DEL",
+    "KC_RGHT",
+    "KC_DOWN",
+    "KC_LEFT",
+    "KC_PGDN"
+   ],
+   [
+    "_______",
+    "KC_NO",
+    "_______",
+    "KC_NO",
+    "_______",
+    "KC_NO"
+   ],
+   [
+    "_______",
+    "_______",
+    "_______",
+    "_______",
+    "_______",
+    "RM_PREV"
+   ]
+  ],
+  [
+   [
+    "_______",
+    "_______",
+    "_______",
+    "_______",
+    "_______",
+    "_______"
+   ],
+   [
+    "_______",
+    "_______",
+    "_______",
+    "_______",
+    "_______",
+    "_______"
+   ],
+   [
+    "_______",
+    "_______",
+    "_______",
+    "_______",
+    "_______",
+    "_______"
+   ],
+   [
+    "_______",
+    "_______",
+    "_______",
+    "_______",
+    "_______",
+    "_______"
+   ],
+   [
+    "_______",
+    "_______",
+    "_______",
+    "_______",
+    "_______",
+    "_______"
+   ],
+   [
+    "_______",
+    "_______",
+    "_______",
+    "_______",
+    "_______",
+    "_______"
+   ],
+   [
+    "_______",
+    "_______",
+    "_______",
+    "_______",
+    "_______",
+    "_______"
+   ],
+   [
+    "_______",
+    "_______",
+    "_______",
+    "_______",
+    "_______",
+    "_______"
+   ],
+   [
+    "_______",
+    "_______",
+    "_______",
+    "_______",
+    "_______",
+    "_______"
+   ],
+   [
+    "_______",
+    "_______",
+    "_______",
+    "_______",
+    "_______",
+    "_______"
+   ]
+  ],
+  [
+   [
+    "_______",
+    "_______",
+    "_______",
+    "_______",
+    "_______",
+    "_______"
+   ],
+   [
+    "_______",
+    "_______",
+    "_______",
+    "_______",
+    "_______",
+    "_______"
+   ],
+   [
+    "_______",
+    "_______",
+    "_______",
+    "_______",
+    "_______",
+    "_______"
+   ],
+   [
+    "_______",
+    "_______",
+    "_______",
+    "_______",
+    "_______",
+    "_______"
+   ],
+   [
+    "_______",
+    "_______",
+    "_______",
+    "_______",
+    "_______",
+    "_______"
+   ],
+   [
+    "_______",
+    "_______",
+    "_______",
+    "_______",
+    "_______",
+    "_______"
+   ],
+   [
+    "_______",
+    "_______",
+    "_______",
+    "_______",
+    "_______",
+    "_______"
+   ],
+   [
+    "_______",
+    "_______",
+    "_______",
+    "_______",
+    "_______",
+    "_______"
+   ],
+   [
+    "_______",
+    "_______",
+    "_______",
+    "_______",
+    "_______",
+    "_______"
+   ],
+   [
+    "_______",
+    "_______",
+    "_______",
+    "_______",
+    "_______",
+    "_______"
+   ]
+  ],
+  [
+   [
+    "_______",
+    "_______",
+    "_______",
+    "_______",
+    "_______",
+    "_______"
+   ],
+   [
+    "_______",
+    "_______",
+    "_______",
+    "_______",
+    "_______",
+    "_______"
+   ],
+   [
+    "_______",
+    "_______",
+    "_______",
+    "_______",
+    "_______",
+    "_______"
+   ],
+   [
+    "_______",
+    "_______",
+    "_______",
+    "_______",
+    "_______",
+    "_______"
+   ],
+   [
+    "_______",
+    "_______",
+    "_______",
+    "_______",
+    "_______",
+    "_______"
+   ],
+   [
+    "_______",
+    "_______",
+    "_______",
+    "_______",
+    "_______",
+    "_______"
+   ],
+   [
+    "_______",
+    "_______",
+    "_______",
+    "_______",
+    "_______",
+    "_______"
+   ],
+   [
+    "_______",
+    "_______",
+    "_______",
+    "_______",
+    "_______",
+    "_______"
+   ],
+   [
+    "_______",
+    "_______",
+    "_______",
+    "_______",
+    "_______",
+    "_______"
+   ],
+   [
+    "_______",
+    "_______",
+    "_______",
+    "_______",
+    "_______",
+    "_______"
+   ]
+  ]
+ ],
+ "encoders": [
+  [
+   {
+    "ccw": 82,
+    "cw": 81
+   },
+   {
+    "ccw": 80,
+    "cw": 79
+   }
+  ],
+  [
+   {
+    "ccw": 170,
+    "cw": 169
+   },
+   {
+    "ccw": 170,
+    "cw": 169
+   }
+  ],
+  [
+   {
+    "ccw": 1,
+    "cw": 1
+   },
+   {
+    "ccw": 1,
+    "cw": 1
+   }
+  ],
+  [
+   {
+    "ccw": 30789,
+    "cw": 30790
+   },
+   {
+    "ccw": 30793,
+    "cw": 30794
+   }
+  ],
+  [
+   {
+    "ccw": 1,
+    "cw": 1
+   },
+   {
+    "ccw": 1,
+    "cw": 1
+   }
+  ],
+  [
+   {
+    "ccw": 1,
+    "cw": 1
+   },
+   {
+    "ccw": 1,
+    "cw": 1
+   }
+  ],
+  [
+   {
+    "ccw": 1,
+    "cw": 1
+   },
+   {
+    "ccw": 1,
+    "cw": 1
+   }
+  ]
+ ],
+ "encoders_names": [
+  [
+   {
+    "ccw": "KC_UP",
+    "cw": "KC_DOWN"
+   },
+   {
+    "ccw": "KC_LEFT",
+    "cw": "KC_RGHT"
+   }
+  ],
+  [
+   {
+    "ccw": "KC_VOLD",
+    "cw": "KC_VOLU"
+   },
+   {
+    "ccw": "KC_VOLD",
+    "cw": "KC_VOLU"
+   }
+  ],
+  [
+   {
+    "ccw": "_______",
+    "cw": "_______"
+   },
+   {
+    "ccw": "_______",
+    "cw": "_______"
+   }
+  ],
+  [
+   {
+    "ccw": "RM_HUEU",
+    "cw": "RM_HUED"
+   },
+   {
+    "ccw": "RM_VALU",
+    "cw": "RM_VALD"
+   }
+  ],
+  [
+   {
+    "ccw": "_______",
+    "cw": "_______"
+   },
+   {
+    "ccw": "_______",
+    "cw": "_______"
+   }
+  ],
+  [
+   {
+    "ccw": "_______",
+    "cw": "_______"
+   },
+   {
+    "ccw": "_______",
+    "cw": "_______"
+   }
+  ],
+  [
+   {
+    "ccw": "_______",
+    "cw": "_______"
+   },
+   {
+    "ccw": "_______",
+    "cw": "_______"
+   }
+  ]
+ ],
+ "macro_buffer_hex": "0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+ "macros": [
+  {
+   "index": 0,
+   "actions": [],
+   "readable": ""
+  },
+  {
+   "index": 1,
+   "actions": [],
+   "readable": ""
+  },
+  {
+   "index": 2,
+   "actions": [],
+   "readable": ""
+  },
+  {
+   "index": 3,
+   "actions": [],
+   "readable": ""
+  },
+  {
+   "index": 4,
+   "actions": [],
+   "readable": ""
+  },
+  {
+   "index": 5,
+   "actions": [],
+   "readable": ""
+  },
+  {
+   "index": 6,
+   "actions": [],
+   "readable": ""
+  },
+  {
+   "index": 7,
+   "actions": [],
+   "readable": ""
+  },
+  {
+   "index": 8,
+   "actions": [],
+   "readable": ""
+  },
+  {
+   "index": 9,
+   "actions": [],
+   "readable": ""
+  },
+  {
+   "index": 10,
+   "actions": [],
+   "readable": ""
+  },
+  {
+   "index": 11,
+   "actions": [],
+   "readable": ""
+  },
+  {
+   "index": 12,
+   "actions": [],
+   "readable": ""
+  },
+  {
+   "index": 13,
+   "actions": [],
+   "readable": ""
+  },
+  {
+   "index": 14,
+   "actions": [],
+   "readable": ""
+  },
+  {
+   "index": 15,
+   "actions": [],
+   "readable": ""
+  }
+ ],
+ "tap_dance": [
+  {
+   "status": 0,
+   "on_tap": 0,
+   "on_hold": 0,
+   "on_double_tap": 0,
+   "on_tap_hold": 0,
+   "tapping_term": 200,
+   "names": {
+    "on_tap": "KC_NO",
+    "on_hold": "KC_NO",
+    "on_double_tap": "KC_NO",
+    "on_tap_hold": "KC_NO"
+   }
+  },
+  {
+   "status": 0,
+   "on_tap": 0,
+   "on_hold": 0,
+   "on_double_tap": 0,
+   "on_tap_hold": 0,
+   "tapping_term": 200,
+   "names": {
+    "on_tap": "KC_NO",
+    "on_hold": "KC_NO",
+    "on_double_tap": "KC_NO",
+    "on_tap_hold": "KC_NO"
+   }
+  },
+  {
+   "status": 0,
+   "on_tap": 0,
+   "on_hold": 0,
+   "on_double_tap": 0,
+   "on_tap_hold": 0,
+   "tapping_term": 200,
+   "names": {
+    "on_tap": "KC_NO",
+    "on_hold": "KC_NO",
+    "on_double_tap": "KC_NO",
+    "on_tap_hold": "KC_NO"
+   }
+  },
+  {
+   "status": 0,
+   "on_tap": 0,
+   "on_hold": 0,
+   "on_double_tap": 0,
+   "on_tap_hold": 0,
+   "tapping_term": 200,
+   "names": {
+    "on_tap": "KC_NO",
+    "on_hold": "KC_NO",
+    "on_double_tap": "KC_NO",
+    "on_tap_hold": "KC_NO"
+   }
+  },
+  {
+   "status": 0,
+   "on_tap": 0,
+   "on_hold": 0,
+   "on_double_tap": 0,
+   "on_tap_hold": 0,
+   "tapping_term": 200,
+   "names": {
+    "on_tap": "KC_NO",
+    "on_hold": "KC_NO",
+    "on_double_tap": "KC_NO",
+    "on_tap_hold": "KC_NO"
+   }
+  },
+  {
+   "status": 0,
+   "on_tap": 0,
+   "on_hold": 0,
+   "on_double_tap": 0,
+   "on_tap_hold": 0,
+   "tapping_term": 200,
+   "names": {
+    "on_tap": "KC_NO",
+    "on_hold": "KC_NO",
+    "on_double_tap": "KC_NO",
+    "on_tap_hold": "KC_NO"
+   }
+  },
+  {
+   "status": 0,
+   "on_tap": 0,
+   "on_hold": 0,
+   "on_double_tap": 0,
+   "on_tap_hold": 0,
+   "tapping_term": 200,
+   "names": {
+    "on_tap": "KC_NO",
+    "on_hold": "KC_NO",
+    "on_double_tap": "KC_NO",
+    "on_tap_hold": "KC_NO"
+   }
+  },
+  {
+   "status": 0,
+   "on_tap": 0,
+   "on_hold": 0,
+   "on_double_tap": 0,
+   "on_tap_hold": 0,
+   "tapping_term": 200,
+   "names": {
+    "on_tap": "KC_NO",
+    "on_hold": "KC_NO",
+    "on_double_tap": "KC_NO",
+    "on_tap_hold": "KC_NO"
+   }
+  },
+  {
+   "status": 0,
+   "on_tap": 0,
+   "on_hold": 0,
+   "on_double_tap": 0,
+   "on_tap_hold": 0,
+   "tapping_term": 200,
+   "names": {
+    "on_tap": "KC_NO",
+    "on_hold": "KC_NO",
+    "on_double_tap": "KC_NO",
+    "on_tap_hold": "KC_NO"
+   }
+  },
+  {
+   "status": 0,
+   "on_tap": 0,
+   "on_hold": 0,
+   "on_double_tap": 0,
+   "on_tap_hold": 0,
+   "tapping_term": 200,
+   "names": {
+    "on_tap": "KC_NO",
+    "on_hold": "KC_NO",
+    "on_double_tap": "KC_NO",
+    "on_tap_hold": "KC_NO"
+   }
+  },
+  {
+   "status": 0,
+   "on_tap": 0,
+   "on_hold": 0,
+   "on_double_tap": 0,
+   "on_tap_hold": 0,
+   "tapping_term": 200,
+   "names": {
+    "on_tap": "KC_NO",
+    "on_hold": "KC_NO",
+    "on_double_tap": "KC_NO",
+    "on_tap_hold": "KC_NO"
+   }
+  },
+  {
+   "status": 0,
+   "on_tap": 0,
+   "on_hold": 0,
+   "on_double_tap": 0,
+   "on_tap_hold": 0,
+   "tapping_term": 200,
+   "names": {
+    "on_tap": "KC_NO",
+    "on_hold": "KC_NO",
+    "on_double_tap": "KC_NO",
+    "on_tap_hold": "KC_NO"
+   }
+  },
+  {
+   "status": 0,
+   "on_tap": 0,
+   "on_hold": 0,
+   "on_double_tap": 0,
+   "on_tap_hold": 0,
+   "tapping_term": 200,
+   "names": {
+    "on_tap": "KC_NO",
+    "on_hold": "KC_NO",
+    "on_double_tap": "KC_NO",
+    "on_tap_hold": "KC_NO"
+   }
+  },
+  {
+   "status": 0,
+   "on_tap": 0,
+   "on_hold": 0,
+   "on_double_tap": 0,
+   "on_tap_hold": 0,
+   "tapping_term": 200,
+   "names": {
+    "on_tap": "KC_NO",
+    "on_hold": "KC_NO",
+    "on_double_tap": "KC_NO",
+    "on_tap_hold": "KC_NO"
+   }
+  },
+  {
+   "status": 0,
+   "on_tap": 0,
+   "on_hold": 0,
+   "on_double_tap": 0,
+   "on_tap_hold": 0,
+   "tapping_term": 200,
+   "names": {
+    "on_tap": "KC_NO",
+    "on_hold": "KC_NO",
+    "on_double_tap": "KC_NO",
+    "on_tap_hold": "KC_NO"
+   }
+  },
+  {
+   "status": 0,
+   "on_tap": 0,
+   "on_hold": 0,
+   "on_double_tap": 0,
+   "on_tap_hold": 0,
+   "tapping_term": 200,
+   "names": {
+    "on_tap": "KC_NO",
+    "on_hold": "KC_NO",
+    "on_double_tap": "KC_NO",
+    "on_tap_hold": "KC_NO"
+   }
+  },
+  {
+   "status": 0,
+   "on_tap": 0,
+   "on_hold": 0,
+   "on_double_tap": 0,
+   "on_tap_hold": 0,
+   "tapping_term": 200,
+   "names": {
+    "on_tap": "KC_NO",
+    "on_hold": "KC_NO",
+    "on_double_tap": "KC_NO",
+    "on_tap_hold": "KC_NO"
+   }
+  },
+  {
+   "status": 0,
+   "on_tap": 0,
+   "on_hold": 0,
+   "on_double_tap": 0,
+   "on_tap_hold": 0,
+   "tapping_term": 200,
+   "names": {
+    "on_tap": "KC_NO",
+    "on_hold": "KC_NO",
+    "on_double_tap": "KC_NO",
+    "on_tap_hold": "KC_NO"
+   }
+  },
+  {
+   "status": 0,
+   "on_tap": 0,
+   "on_hold": 0,
+   "on_double_tap": 0,
+   "on_tap_hold": 0,
+   "tapping_term": 200,
+   "names": {
+    "on_tap": "KC_NO",
+    "on_hold": "KC_NO",
+    "on_double_tap": "KC_NO",
+    "on_tap_hold": "KC_NO"
+   }
+  },
+  {
+   "status": 0,
+   "on_tap": 0,
+   "on_hold": 0,
+   "on_double_tap": 0,
+   "on_tap_hold": 0,
+   "tapping_term": 200,
+   "names": {
+    "on_tap": "KC_NO",
+    "on_hold": "KC_NO",
+    "on_double_tap": "KC_NO",
+    "on_tap_hold": "KC_NO"
+   }
+  },
+  {
+   "status": 0,
+   "on_tap": 0,
+   "on_hold": 0,
+   "on_double_tap": 0,
+   "on_tap_hold": 0,
+   "tapping_term": 200,
+   "names": {
+    "on_tap": "KC_NO",
+    "on_hold": "KC_NO",
+    "on_double_tap": "KC_NO",
+    "on_tap_hold": "KC_NO"
+   }
+  },
+  {
+   "status": 0,
+   "on_tap": 0,
+   "on_hold": 0,
+   "on_double_tap": 0,
+   "on_tap_hold": 0,
+   "tapping_term": 200,
+   "names": {
+    "on_tap": "KC_NO",
+    "on_hold": "KC_NO",
+    "on_double_tap": "KC_NO",
+    "on_tap_hold": "KC_NO"
+   }
+  },
+  {
+   "status": 0,
+   "on_tap": 0,
+   "on_hold": 0,
+   "on_double_tap": 0,
+   "on_tap_hold": 0,
+   "tapping_term": 200,
+   "names": {
+    "on_tap": "KC_NO",
+    "on_hold": "KC_NO",
+    "on_double_tap": "KC_NO",
+    "on_tap_hold": "KC_NO"
+   }
+  },
+  {
+   "status": 0,
+   "on_tap": 0,
+   "on_hold": 0,
+   "on_double_tap": 0,
+   "on_tap_hold": 0,
+   "tapping_term": 200,
+   "names": {
+    "on_tap": "KC_NO",
+    "on_hold": "KC_NO",
+    "on_double_tap": "KC_NO",
+    "on_tap_hold": "KC_NO"
+   }
+  },
+  {
+   "status": 0,
+   "on_tap": 0,
+   "on_hold": 0,
+   "on_double_tap": 0,
+   "on_tap_hold": 0,
+   "tapping_term": 200,
+   "names": {
+    "on_tap": "KC_NO",
+    "on_hold": "KC_NO",
+    "on_double_tap": "KC_NO",
+    "on_tap_hold": "KC_NO"
+   }
+  },
+  {
+   "status": 0,
+   "on_tap": 0,
+   "on_hold": 0,
+   "on_double_tap": 0,
+   "on_tap_hold": 0,
+   "tapping_term": 200,
+   "names": {
+    "on_tap": "KC_NO",
+    "on_hold": "KC_NO",
+    "on_double_tap": "KC_NO",
+    "on_tap_hold": "KC_NO"
+   }
+  },
+  {
+   "status": 0,
+   "on_tap": 0,
+   "on_hold": 0,
+   "on_double_tap": 0,
+   "on_tap_hold": 0,
+   "tapping_term": 200,
+   "names": {
+    "on_tap": "KC_NO",
+    "on_hold": "KC_NO",
+    "on_double_tap": "KC_NO",
+    "on_tap_hold": "KC_NO"
+   }
+  },
+  {
+   "status": 0,
+   "on_tap": 0,
+   "on_hold": 0,
+   "on_double_tap": 0,
+   "on_tap_hold": 0,
+   "tapping_term": 200,
+   "names": {
+    "on_tap": "KC_NO",
+    "on_hold": "KC_NO",
+    "on_double_tap": "KC_NO",
+    "on_tap_hold": "KC_NO"
+   }
+  },
+  {
+   "status": 0,
+   "on_tap": 0,
+   "on_hold": 0,
+   "on_double_tap": 0,
+   "on_tap_hold": 0,
+   "tapping_term": 200,
+   "names": {
+    "on_tap": "KC_NO",
+    "on_hold": "KC_NO",
+    "on_double_tap": "KC_NO",
+    "on_tap_hold": "KC_NO"
+   }
+  },
+  {
+   "status": 0,
+   "on_tap": 0,
+   "on_hold": 0,
+   "on_double_tap": 0,
+   "on_tap_hold": 0,
+   "tapping_term": 200,
+   "names": {
+    "on_tap": "KC_NO",
+    "on_hold": "KC_NO",
+    "on_double_tap": "KC_NO",
+    "on_tap_hold": "KC_NO"
+   }
+  },
+  {
+   "status": 0,
+   "on_tap": 0,
+   "on_hold": 0,
+   "on_double_tap": 0,
+   "on_tap_hold": 0,
+   "tapping_term": 200,
+   "names": {
+    "on_tap": "KC_NO",
+    "on_hold": "KC_NO",
+    "on_double_tap": "KC_NO",
+    "on_tap_hold": "KC_NO"
+   }
+  },
+  {
+   "status": 0,
+   "on_tap": 0,
+   "on_hold": 0,
+   "on_double_tap": 0,
+   "on_tap_hold": 0,
+   "tapping_term": 200,
+   "names": {
+    "on_tap": "KC_NO",
+    "on_hold": "KC_NO",
+    "on_double_tap": "KC_NO",
+    "on_tap_hold": "KC_NO"
+   }
+  }
+ ],
+ "combos": [
+  {
+   "status": 0,
+   "input": [
+    0,
+    0,
+    0,
+    0
+   ],
+   "output": 0,
+   "names": {
+    "input": [
+     "KC_NO",
+     "KC_NO",
+     "KC_NO",
+     "KC_NO"
+    ],
+    "output": "KC_NO"
+   }
+  },
+  {
+   "status": 0,
+   "input": [
+    0,
+    0,
+    0,
+    0
+   ],
+   "output": 0,
+   "names": {
+    "input": [
+     "KC_NO",
+     "KC_NO",
+     "KC_NO",
+     "KC_NO"
+    ],
+    "output": "KC_NO"
+   }
+  },
+  {
+   "status": 0,
+   "input": [
+    0,
+    0,
+    0,
+    0
+   ],
+   "output": 0,
+   "names": {
+    "input": [
+     "KC_NO",
+     "KC_NO",
+     "KC_NO",
+     "KC_NO"
+    ],
+    "output": "KC_NO"
+   }
+  },
+  {
+   "status": 0,
+   "input": [
+    0,
+    0,
+    0,
+    0
+   ],
+   "output": 0,
+   "names": {
+    "input": [
+     "KC_NO",
+     "KC_NO",
+     "KC_NO",
+     "KC_NO"
+    ],
+    "output": "KC_NO"
+   }
+  },
+  {
+   "status": 0,
+   "input": [
+    0,
+    0,
+    0,
+    0
+   ],
+   "output": 0,
+   "names": {
+    "input": [
+     "KC_NO",
+     "KC_NO",
+     "KC_NO",
+     "KC_NO"
+    ],
+    "output": "KC_NO"
+   }
+  },
+  {
+   "status": 0,
+   "input": [
+    0,
+    0,
+    0,
+    0
+   ],
+   "output": 0,
+   "names": {
+    "input": [
+     "KC_NO",
+     "KC_NO",
+     "KC_NO",
+     "KC_NO"
+    ],
+    "output": "KC_NO"
+   }
+  },
+  {
+   "status": 0,
+   "input": [
+    0,
+    0,
+    0,
+    0
+   ],
+   "output": 0,
+   "names": {
+    "input": [
+     "KC_NO",
+     "KC_NO",
+     "KC_NO",
+     "KC_NO"
+    ],
+    "output": "KC_NO"
+   }
+  },
+  {
+   "status": 0,
+   "input": [
+    0,
+    0,
+    0,
+    0
+   ],
+   "output": 0,
+   "names": {
+    "input": [
+     "KC_NO",
+     "KC_NO",
+     "KC_NO",
+     "KC_NO"
+    ],
+    "output": "KC_NO"
+   }
+  },
+  {
+   "status": 0,
+   "input": [
+    0,
+    0,
+    0,
+    0
+   ],
+   "output": 0,
+   "names": {
+    "input": [
+     "KC_NO",
+     "KC_NO",
+     "KC_NO",
+     "KC_NO"
+    ],
+    "output": "KC_NO"
+   }
+  },
+  {
+   "status": 0,
+   "input": [
+    0,
+    0,
+    0,
+    0
+   ],
+   "output": 0,
+   "names": {
+    "input": [
+     "KC_NO",
+     "KC_NO",
+     "KC_NO",
+     "KC_NO"
+    ],
+    "output": "KC_NO"
+   }
+  },
+  {
+   "status": 0,
+   "input": [
+    0,
+    0,
+    0,
+    0
+   ],
+   "output": 0,
+   "names": {
+    "input": [
+     "KC_NO",
+     "KC_NO",
+     "KC_NO",
+     "KC_NO"
+    ],
+    "output": "KC_NO"
+   }
+  },
+  {
+   "status": 0,
+   "input": [
+    0,
+    0,
+    0,
+    0
+   ],
+   "output": 0,
+   "names": {
+    "input": [
+     "KC_NO",
+     "KC_NO",
+     "KC_NO",
+     "KC_NO"
+    ],
+    "output": "KC_NO"
+   }
+  },
+  {
+   "status": 0,
+   "input": [
+    0,
+    0,
+    0,
+    0
+   ],
+   "output": 0,
+   "names": {
+    "input": [
+     "KC_NO",
+     "KC_NO",
+     "KC_NO",
+     "KC_NO"
+    ],
+    "output": "KC_NO"
+   }
+  },
+  {
+   "status": 0,
+   "input": [
+    0,
+    0,
+    0,
+    0
+   ],
+   "output": 0,
+   "names": {
+    "input": [
+     "KC_NO",
+     "KC_NO",
+     "KC_NO",
+     "KC_NO"
+    ],
+    "output": "KC_NO"
+   }
+  },
+  {
+   "status": 0,
+   "input": [
+    0,
+    0,
+    0,
+    0
+   ],
+   "output": 0,
+   "names": {
+    "input": [
+     "KC_NO",
+     "KC_NO",
+     "KC_NO",
+     "KC_NO"
+    ],
+    "output": "KC_NO"
+   }
+  },
+  {
+   "status": 0,
+   "input": [
+    0,
+    0,
+    0,
+    0
+   ],
+   "output": 0,
+   "names": {
+    "input": [
+     "KC_NO",
+     "KC_NO",
+     "KC_NO",
+     "KC_NO"
+    ],
+    "output": "KC_NO"
+   }
+  },
+  {
+   "status": 0,
+   "input": [
+    0,
+    0,
+    0,
+    0
+   ],
+   "output": 0,
+   "names": {
+    "input": [
+     "KC_NO",
+     "KC_NO",
+     "KC_NO",
+     "KC_NO"
+    ],
+    "output": "KC_NO"
+   }
+  },
+  {
+   "status": 0,
+   "input": [
+    0,
+    0,
+    0,
+    0
+   ],
+   "output": 0,
+   "names": {
+    "input": [
+     "KC_NO",
+     "KC_NO",
+     "KC_NO",
+     "KC_NO"
+    ],
+    "output": "KC_NO"
+   }
+  },
+  {
+   "status": 0,
+   "input": [
+    0,
+    0,
+    0,
+    0
+   ],
+   "output": 0,
+   "names": {
+    "input": [
+     "KC_NO",
+     "KC_NO",
+     "KC_NO",
+     "KC_NO"
+    ],
+    "output": "KC_NO"
+   }
+  },
+  {
+   "status": 0,
+   "input": [
+    0,
+    0,
+    0,
+    0
+   ],
+   "output": 0,
+   "names": {
+    "input": [
+     "KC_NO",
+     "KC_NO",
+     "KC_NO",
+     "KC_NO"
+    ],
+    "output": "KC_NO"
+   }
+  },
+  {
+   "status": 0,
+   "input": [
+    0,
+    0,
+    0,
+    0
+   ],
+   "output": 0,
+   "names": {
+    "input": [
+     "KC_NO",
+     "KC_NO",
+     "KC_NO",
+     "KC_NO"
+    ],
+    "output": "KC_NO"
+   }
+  },
+  {
+   "status": 0,
+   "input": [
+    0,
+    0,
+    0,
+    0
+   ],
+   "output": 0,
+   "names": {
+    "input": [
+     "KC_NO",
+     "KC_NO",
+     "KC_NO",
+     "KC_NO"
+    ],
+    "output": "KC_NO"
+   }
+  },
+  {
+   "status": 0,
+   "input": [
+    0,
+    0,
+    0,
+    0
+   ],
+   "output": 0,
+   "names": {
+    "input": [
+     "KC_NO",
+     "KC_NO",
+     "KC_NO",
+     "KC_NO"
+    ],
+    "output": "KC_NO"
+   }
+  },
+  {
+   "status": 0,
+   "input": [
+    0,
+    0,
+    0,
+    0
+   ],
+   "output": 0,
+   "names": {
+    "input": [
+     "KC_NO",
+     "KC_NO",
+     "KC_NO",
+     "KC_NO"
+    ],
+    "output": "KC_NO"
+   }
+  },
+  {
+   "status": 0,
+   "input": [
+    0,
+    0,
+    0,
+    0
+   ],
+   "output": 0,
+   "names": {
+    "input": [
+     "KC_NO",
+     "KC_NO",
+     "KC_NO",
+     "KC_NO"
+    ],
+    "output": "KC_NO"
+   }
+  },
+  {
+   "status": 0,
+   "input": [
+    0,
+    0,
+    0,
+    0
+   ],
+   "output": 0,
+   "names": {
+    "input": [
+     "KC_NO",
+     "KC_NO",
+     "KC_NO",
+     "KC_NO"
+    ],
+    "output": "KC_NO"
+   }
+  },
+  {
+   "status": 0,
+   "input": [
+    0,
+    0,
+    0,
+    0
+   ],
+   "output": 0,
+   "names": {
+    "input": [
+     "KC_NO",
+     "KC_NO",
+     "KC_NO",
+     "KC_NO"
+    ],
+    "output": "KC_NO"
+   }
+  },
+  {
+   "status": 0,
+   "input": [
+    0,
+    0,
+    0,
+    0
+   ],
+   "output": 0,
+   "names": {
+    "input": [
+     "KC_NO",
+     "KC_NO",
+     "KC_NO",
+     "KC_NO"
+    ],
+    "output": "KC_NO"
+   }
+  },
+  {
+   "status": 0,
+   "input": [
+    0,
+    0,
+    0,
+    0
+   ],
+   "output": 0,
+   "names": {
+    "input": [
+     "KC_NO",
+     "KC_NO",
+     "KC_NO",
+     "KC_NO"
+    ],
+    "output": "KC_NO"
+   }
+  },
+  {
+   "status": 0,
+   "input": [
+    0,
+    0,
+    0,
+    0
+   ],
+   "output": 0,
+   "names": {
+    "input": [
+     "KC_NO",
+     "KC_NO",
+     "KC_NO",
+     "KC_NO"
+    ],
+    "output": "KC_NO"
+   }
+  },
+  {
+   "status": 0,
+   "input": [
+    0,
+    0,
+    0,
+    0
+   ],
+   "output": 0,
+   "names": {
+    "input": [
+     "KC_NO",
+     "KC_NO",
+     "KC_NO",
+     "KC_NO"
+    ],
+    "output": "KC_NO"
+   }
+  },
+  {
+   "status": 0,
+   "input": [
+    0,
+    0,
+    0,
+    0
+   ],
+   "output": 0,
+   "names": {
+    "input": [
+     "KC_NO",
+     "KC_NO",
+     "KC_NO",
+     "KC_NO"
+    ],
+    "output": "KC_NO"
+   }
+  }
+ ],
+ "key_overrides": [
+  {
+   "status": 0,
+   "trigger": 0,
+   "replacement": 0,
+   "layers": 65535,
+   "trigger_mods": 0,
+   "negative_mod_mask": 0,
+   "suppressed_mods": 0,
+   "options": 7,
+   "names": {
+    "trigger": "KC_NO",
+    "replacement": "KC_NO"
+   }
+  },
+  {
+   "status": 0,
+   "trigger": 0,
+   "replacement": 0,
+   "layers": 65535,
+   "trigger_mods": 0,
+   "negative_mod_mask": 0,
+   "suppressed_mods": 0,
+   "options": 7,
+   "names": {
+    "trigger": "KC_NO",
+    "replacement": "KC_NO"
+   }
+  },
+  {
+   "status": 0,
+   "trigger": 0,
+   "replacement": 0,
+   "layers": 65535,
+   "trigger_mods": 0,
+   "negative_mod_mask": 0,
+   "suppressed_mods": 0,
+   "options": 7,
+   "names": {
+    "trigger": "KC_NO",
+    "replacement": "KC_NO"
+   }
+  },
+  {
+   "status": 0,
+   "trigger": 0,
+   "replacement": 0,
+   "layers": 65535,
+   "trigger_mods": 0,
+   "negative_mod_mask": 0,
+   "suppressed_mods": 0,
+   "options": 7,
+   "names": {
+    "trigger": "KC_NO",
+    "replacement": "KC_NO"
+   }
+  },
+  {
+   "status": 0,
+   "trigger": 0,
+   "replacement": 0,
+   "layers": 65535,
+   "trigger_mods": 0,
+   "negative_mod_mask": 0,
+   "suppressed_mods": 0,
+   "options": 7,
+   "names": {
+    "trigger": "KC_NO",
+    "replacement": "KC_NO"
+   }
+  },
+  {
+   "status": 0,
+   "trigger": 0,
+   "replacement": 0,
+   "layers": 65535,
+   "trigger_mods": 0,
+   "negative_mod_mask": 0,
+   "suppressed_mods": 0,
+   "options": 7,
+   "names": {
+    "trigger": "KC_NO",
+    "replacement": "KC_NO"
+   }
+  },
+  {
+   "status": 0,
+   "trigger": 0,
+   "replacement": 0,
+   "layers": 65535,
+   "trigger_mods": 0,
+   "negative_mod_mask": 0,
+   "suppressed_mods": 0,
+   "options": 7,
+   "names": {
+    "trigger": "KC_NO",
+    "replacement": "KC_NO"
+   }
+  },
+  {
+   "status": 0,
+   "trigger": 0,
+   "replacement": 0,
+   "layers": 65535,
+   "trigger_mods": 0,
+   "negative_mod_mask": 0,
+   "suppressed_mods": 0,
+   "options": 7,
+   "names": {
+    "trigger": "KC_NO",
+    "replacement": "KC_NO"
+   }
+  },
+  {
+   "status": 0,
+   "trigger": 0,
+   "replacement": 0,
+   "layers": 65535,
+   "trigger_mods": 0,
+   "negative_mod_mask": 0,
+   "suppressed_mods": 0,
+   "options": 7,
+   "names": {
+    "trigger": "KC_NO",
+    "replacement": "KC_NO"
+   }
+  },
+  {
+   "status": 0,
+   "trigger": 0,
+   "replacement": 0,
+   "layers": 65535,
+   "trigger_mods": 0,
+   "negative_mod_mask": 0,
+   "suppressed_mods": 0,
+   "options": 7,
+   "names": {
+    "trigger": "KC_NO",
+    "replacement": "KC_NO"
+   }
+  },
+  {
+   "status": 0,
+   "trigger": 0,
+   "replacement": 0,
+   "layers": 65535,
+   "trigger_mods": 0,
+   "negative_mod_mask": 0,
+   "suppressed_mods": 0,
+   "options": 7,
+   "names": {
+    "trigger": "KC_NO",
+    "replacement": "KC_NO"
+   }
+  },
+  {
+   "status": 0,
+   "trigger": 0,
+   "replacement": 0,
+   "layers": 65535,
+   "trigger_mods": 0,
+   "negative_mod_mask": 0,
+   "suppressed_mods": 0,
+   "options": 7,
+   "names": {
+    "trigger": "KC_NO",
+    "replacement": "KC_NO"
+   }
+  },
+  {
+   "status": 0,
+   "trigger": 0,
+   "replacement": 0,
+   "layers": 65535,
+   "trigger_mods": 0,
+   "negative_mod_mask": 0,
+   "suppressed_mods": 0,
+   "options": 7,
+   "names": {
+    "trigger": "KC_NO",
+    "replacement": "KC_NO"
+   }
+  },
+  {
+   "status": 0,
+   "trigger": 0,
+   "replacement": 0,
+   "layers": 65535,
+   "trigger_mods": 0,
+   "negative_mod_mask": 0,
+   "suppressed_mods": 0,
+   "options": 7,
+   "names": {
+    "trigger": "KC_NO",
+    "replacement": "KC_NO"
+   }
+  },
+  {
+   "status": 0,
+   "trigger": 0,
+   "replacement": 0,
+   "layers": 65535,
+   "trigger_mods": 0,
+   "negative_mod_mask": 0,
+   "suppressed_mods": 0,
+   "options": 7,
+   "names": {
+    "trigger": "KC_NO",
+    "replacement": "KC_NO"
+   }
+  },
+  {
+   "status": 0,
+   "trigger": 0,
+   "replacement": 0,
+   "layers": 65535,
+   "trigger_mods": 0,
+   "negative_mod_mask": 0,
+   "suppressed_mods": 0,
+   "options": 7,
+   "names": {
+    "trigger": "KC_NO",
+    "replacement": "KC_NO"
+   }
+  },
+  {
+   "status": 0,
+   "trigger": 0,
+   "replacement": 0,
+   "layers": 65535,
+   "trigger_mods": 0,
+   "negative_mod_mask": 0,
+   "suppressed_mods": 0,
+   "options": 7,
+   "names": {
+    "trigger": "KC_NO",
+    "replacement": "KC_NO"
+   }
+  },
+  {
+   "status": 0,
+   "trigger": 0,
+   "replacement": 0,
+   "layers": 65535,
+   "trigger_mods": 0,
+   "negative_mod_mask": 0,
+   "suppressed_mods": 0,
+   "options": 7,
+   "names": {
+    "trigger": "KC_NO",
+    "replacement": "KC_NO"
+   }
+  },
+  {
+   "status": 0,
+   "trigger": 0,
+   "replacement": 0,
+   "layers": 65535,
+   "trigger_mods": 0,
+   "negative_mod_mask": 0,
+   "suppressed_mods": 0,
+   "options": 7,
+   "names": {
+    "trigger": "KC_NO",
+    "replacement": "KC_NO"
+   }
+  },
+  {
+   "status": 0,
+   "trigger": 0,
+   "replacement": 0,
+   "layers": 65535,
+   "trigger_mods": 0,
+   "negative_mod_mask": 0,
+   "suppressed_mods": 0,
+   "options": 7,
+   "names": {
+    "trigger": "KC_NO",
+    "replacement": "KC_NO"
+   }
+  },
+  {
+   "status": 0,
+   "trigger": 0,
+   "replacement": 0,
+   "layers": 65535,
+   "trigger_mods": 0,
+   "negative_mod_mask": 0,
+   "suppressed_mods": 0,
+   "options": 7,
+   "names": {
+    "trigger": "KC_NO",
+    "replacement": "KC_NO"
+   }
+  },
+  {
+   "status": 0,
+   "trigger": 0,
+   "replacement": 0,
+   "layers": 65535,
+   "trigger_mods": 0,
+   "negative_mod_mask": 0,
+   "suppressed_mods": 0,
+   "options": 7,
+   "names": {
+    "trigger": "KC_NO",
+    "replacement": "KC_NO"
+   }
+  },
+  {
+   "status": 0,
+   "trigger": 0,
+   "replacement": 0,
+   "layers": 65535,
+   "trigger_mods": 0,
+   "negative_mod_mask": 0,
+   "suppressed_mods": 0,
+   "options": 7,
+   "names": {
+    "trigger": "KC_NO",
+    "replacement": "KC_NO"
+   }
+  },
+  {
+   "status": 0,
+   "trigger": 0,
+   "replacement": 0,
+   "layers": 65535,
+   "trigger_mods": 0,
+   "negative_mod_mask": 0,
+   "suppressed_mods": 0,
+   "options": 7,
+   "names": {
+    "trigger": "KC_NO",
+    "replacement": "KC_NO"
+   }
+  },
+  {
+   "status": 0,
+   "trigger": 0,
+   "replacement": 0,
+   "layers": 65535,
+   "trigger_mods": 0,
+   "negative_mod_mask": 0,
+   "suppressed_mods": 0,
+   "options": 7,
+   "names": {
+    "trigger": "KC_NO",
+    "replacement": "KC_NO"
+   }
+  },
+  {
+   "status": 0,
+   "trigger": 0,
+   "replacement": 0,
+   "layers": 65535,
+   "trigger_mods": 0,
+   "negative_mod_mask": 0,
+   "suppressed_mods": 0,
+   "options": 7,
+   "names": {
+    "trigger": "KC_NO",
+    "replacement": "KC_NO"
+   }
+  },
+  {
+   "status": 0,
+   "trigger": 0,
+   "replacement": 0,
+   "layers": 65535,
+   "trigger_mods": 0,
+   "negative_mod_mask": 0,
+   "suppressed_mods": 0,
+   "options": 7,
+   "names": {
+    "trigger": "KC_NO",
+    "replacement": "KC_NO"
+   }
+  },
+  {
+   "status": 0,
+   "trigger": 0,
+   "replacement": 0,
+   "layers": 65535,
+   "trigger_mods": 0,
+   "negative_mod_mask": 0,
+   "suppressed_mods": 0,
+   "options": 7,
+   "names": {
+    "trigger": "KC_NO",
+    "replacement": "KC_NO"
+   }
+  },
+  {
+   "status": 0,
+   "trigger": 0,
+   "replacement": 0,
+   "layers": 65535,
+   "trigger_mods": 0,
+   "negative_mod_mask": 0,
+   "suppressed_mods": 0,
+   "options": 7,
+   "names": {
+    "trigger": "KC_NO",
+    "replacement": "KC_NO"
+   }
+  },
+  {
+   "status": 0,
+   "trigger": 0,
+   "replacement": 0,
+   "layers": 65535,
+   "trigger_mods": 0,
+   "negative_mod_mask": 0,
+   "suppressed_mods": 0,
+   "options": 7,
+   "names": {
+    "trigger": "KC_NO",
+    "replacement": "KC_NO"
+   }
+  },
+  {
+   "status": 0,
+   "trigger": 0,
+   "replacement": 0,
+   "layers": 65535,
+   "trigger_mods": 0,
+   "negative_mod_mask": 0,
+   "suppressed_mods": 0,
+   "options": 7,
+   "names": {
+    "trigger": "KC_NO",
+    "replacement": "KC_NO"
+   }
+  },
+  {
+   "status": 0,
+   "trigger": 0,
+   "replacement": 0,
+   "layers": 65535,
+   "trigger_mods": 0,
+   "negative_mod_mask": 0,
+   "suppressed_mods": 0,
+   "options": 7,
+   "names": {
+    "trigger": "KC_NO",
+    "replacement": "KC_NO"
+   }
+  }
+ ],
+ "alt_repeat_keys": [
+  {
+   "status": 0,
+   "keycode": 0,
+   "alt_keycode": 0,
+   "allowed_mods": 0,
+   "options": 0,
+   "names": {
+    "keycode": "KC_NO",
+    "alt_keycode": "KC_NO"
+   }
+  },
+  {
+   "status": 0,
+   "keycode": 0,
+   "alt_keycode": 0,
+   "allowed_mods": 0,
+   "options": 0,
+   "names": {
+    "keycode": "KC_NO",
+    "alt_keycode": "KC_NO"
+   }
+  },
+  {
+   "status": 0,
+   "keycode": 0,
+   "alt_keycode": 0,
+   "allowed_mods": 0,
+   "options": 0,
+   "names": {
+    "keycode": "KC_NO",
+    "alt_keycode": "KC_NO"
+   }
+  },
+  {
+   "status": 0,
+   "keycode": 0,
+   "alt_keycode": 0,
+   "allowed_mods": 0,
+   "options": 0,
+   "names": {
+    "keycode": "KC_NO",
+    "alt_keycode": "KC_NO"
+   }
+  },
+  {
+   "status": 0,
+   "keycode": 0,
+   "alt_keycode": 0,
+   "allowed_mods": 0,
+   "options": 0,
+   "names": {
+    "keycode": "KC_NO",
+    "alt_keycode": "KC_NO"
+   }
+  },
+  {
+   "status": 0,
+   "keycode": 0,
+   "alt_keycode": 0,
+   "allowed_mods": 0,
+   "options": 0,
+   "names": {
+    "keycode": "KC_NO",
+    "alt_keycode": "KC_NO"
+   }
+  },
+  {
+   "status": 0,
+   "keycode": 0,
+   "alt_keycode": 0,
+   "allowed_mods": 0,
+   "options": 0,
+   "names": {
+    "keycode": "KC_NO",
+    "alt_keycode": "KC_NO"
+   }
+  },
+  {
+   "status": 0,
+   "keycode": 0,
+   "alt_keycode": 0,
+   "allowed_mods": 0,
+   "options": 0,
+   "names": {
+    "keycode": "KC_NO",
+    "alt_keycode": "KC_NO"
+   }
+  },
+  {
+   "status": 0,
+   "keycode": 0,
+   "alt_keycode": 0,
+   "allowed_mods": 0,
+   "options": 0,
+   "names": {
+    "keycode": "KC_NO",
+    "alt_keycode": "KC_NO"
+   }
+  },
+  {
+   "status": 0,
+   "keycode": 0,
+   "alt_keycode": 0,
+   "allowed_mods": 0,
+   "options": 0,
+   "names": {
+    "keycode": "KC_NO",
+    "alt_keycode": "KC_NO"
+   }
+  },
+  {
+   "status": 0,
+   "keycode": 0,
+   "alt_keycode": 0,
+   "allowed_mods": 0,
+   "options": 0,
+   "names": {
+    "keycode": "KC_NO",
+    "alt_keycode": "KC_NO"
+   }
+  },
+  {
+   "status": 0,
+   "keycode": 0,
+   "alt_keycode": 0,
+   "allowed_mods": 0,
+   "options": 0,
+   "names": {
+    "keycode": "KC_NO",
+    "alt_keycode": "KC_NO"
+   }
+  },
+  {
+   "status": 0,
+   "keycode": 0,
+   "alt_keycode": 0,
+   "allowed_mods": 0,
+   "options": 0,
+   "names": {
+    "keycode": "KC_NO",
+    "alt_keycode": "KC_NO"
+   }
+  },
+  {
+   "status": 0,
+   "keycode": 0,
+   "alt_keycode": 0,
+   "allowed_mods": 0,
+   "options": 0,
+   "names": {
+    "keycode": "KC_NO",
+    "alt_keycode": "KC_NO"
+   }
+  },
+  {
+   "status": 0,
+   "keycode": 0,
+   "alt_keycode": 0,
+   "allowed_mods": 0,
+   "options": 0,
+   "names": {
+    "keycode": "KC_NO",
+    "alt_keycode": "KC_NO"
+   }
+  },
+  {
+   "status": 0,
+   "keycode": 0,
+   "alt_keycode": 0,
+   "allowed_mods": 0,
+   "options": 0,
+   "names": {
+    "keycode": "KC_NO",
+    "alt_keycode": "KC_NO"
+   }
+  },
+  {
+   "status": 0,
+   "keycode": 0,
+   "alt_keycode": 0,
+   "allowed_mods": 0,
+   "options": 0,
+   "names": {
+    "keycode": "KC_NO",
+    "alt_keycode": "KC_NO"
+   }
+  },
+  {
+   "status": 0,
+   "keycode": 0,
+   "alt_keycode": 0,
+   "allowed_mods": 0,
+   "options": 0,
+   "names": {
+    "keycode": "KC_NO",
+    "alt_keycode": "KC_NO"
+   }
+  },
+  {
+   "status": 0,
+   "keycode": 0,
+   "alt_keycode": 0,
+   "allowed_mods": 0,
+   "options": 0,
+   "names": {
+    "keycode": "KC_NO",
+    "alt_keycode": "KC_NO"
+   }
+  },
+  {
+   "status": 0,
+   "keycode": 0,
+   "alt_keycode": 0,
+   "allowed_mods": 0,
+   "options": 0,
+   "names": {
+    "keycode": "KC_NO",
+    "alt_keycode": "KC_NO"
+   }
+  },
+  {
+   "status": 0,
+   "keycode": 0,
+   "alt_keycode": 0,
+   "allowed_mods": 0,
+   "options": 0,
+   "names": {
+    "keycode": "KC_NO",
+    "alt_keycode": "KC_NO"
+   }
+  },
+  {
+   "status": 0,
+   "keycode": 0,
+   "alt_keycode": 0,
+   "allowed_mods": 0,
+   "options": 0,
+   "names": {
+    "keycode": "KC_NO",
+    "alt_keycode": "KC_NO"
+   }
+  },
+  {
+   "status": 0,
+   "keycode": 0,
+   "alt_keycode": 0,
+   "allowed_mods": 0,
+   "options": 0,
+   "names": {
+    "keycode": "KC_NO",
+    "alt_keycode": "KC_NO"
+   }
+  },
+  {
+   "status": 0,
+   "keycode": 0,
+   "alt_keycode": 0,
+   "allowed_mods": 0,
+   "options": 0,
+   "names": {
+    "keycode": "KC_NO",
+    "alt_keycode": "KC_NO"
+   }
+  },
+  {
+   "status": 0,
+   "keycode": 0,
+   "alt_keycode": 0,
+   "allowed_mods": 0,
+   "options": 0,
+   "names": {
+    "keycode": "KC_NO",
+    "alt_keycode": "KC_NO"
+   }
+  },
+  {
+   "status": 0,
+   "keycode": 0,
+   "alt_keycode": 0,
+   "allowed_mods": 0,
+   "options": 0,
+   "names": {
+    "keycode": "KC_NO",
+    "alt_keycode": "KC_NO"
+   }
+  },
+  {
+   "status": 0,
+   "keycode": 0,
+   "alt_keycode": 0,
+   "allowed_mods": 0,
+   "options": 0,
+   "names": {
+    "keycode": "KC_NO",
+    "alt_keycode": "KC_NO"
+   }
+  },
+  {
+   "status": 0,
+   "keycode": 0,
+   "alt_keycode": 0,
+   "allowed_mods": 0,
+   "options": 0,
+   "names": {
+    "keycode": "KC_NO",
+    "alt_keycode": "KC_NO"
+   }
+  },
+  {
+   "status": 0,
+   "keycode": 0,
+   "alt_keycode": 0,
+   "allowed_mods": 0,
+   "options": 0,
+   "names": {
+    "keycode": "KC_NO",
+    "alt_keycode": "KC_NO"
+   }
+  },
+  {
+   "status": 0,
+   "keycode": 0,
+   "alt_keycode": 0,
+   "allowed_mods": 0,
+   "options": 0,
+   "names": {
+    "keycode": "KC_NO",
+    "alt_keycode": "KC_NO"
+   }
+  },
+  {
+   "status": 0,
+   "keycode": 0,
+   "alt_keycode": 0,
+   "allowed_mods": 0,
+   "options": 0,
+   "names": {
+    "keycode": "KC_NO",
+    "alt_keycode": "KC_NO"
+   }
+  },
+  {
+   "status": 0,
+   "keycode": 0,
+   "alt_keycode": 0,
+   "allowed_mods": 0,
+   "options": 0,
+   "names": {
+    "keycode": "KC_NO",
+    "alt_keycode": "KC_NO"
+   }
+  }
+ ],
+ "qmk_settings": {
+  "1": {
+   "status": 0,
+   "raw_hex": "00010000",
+   "width_assumed": 1,
+   "value": 0
+  },
+  "2": {
+   "status": 0,
+   "raw_hex": "32000000",
+   "width_assumed": 2,
+   "value": 50
+  },
+  "3": {
+   "status": 0,
+   "raw_hex": "00030000",
+   "width_assumed": 1,
+   "value": 0
+  },
+  "4": {
+   "status": 0,
+   "raw_hex": "af000000",
+   "width_assumed": 2,
+   "value": 175
+  },
+  "5": {
+   "status": 0,
+   "raw_hex": "05050000",
+   "width_assumed": 1,
+   "value": 5
+  },
+  "6": {
+   "status": 0,
+   "raw_hex": "88130000",
+   "width_assumed": 2,
+   "value": 5000
+  },
+  "7": {
+   "status": 0,
+   "raw_hex": "c8000000",
+   "width_assumed": 2,
+   "value": 200
+  },
+  "9": {
+   "status": 0,
+   "raw_hex": "0a000000",
+   "width_assumed": 2,
+   "value": 10
+  },
+  "10": {
+   "status": 0,
+   "raw_hex": "14000000",
+   "width_assumed": 2,
+   "value": 20
+  },
+  "11": {
+   "status": 0,
+   "raw_hex": "08000000",
+   "width_assumed": 2,
+   "value": 8
+  },
+  "12": {
+   "status": 0,
+   "raw_hex": "0a000000",
+   "width_assumed": 2,
+   "value": 10
+  },
+  "13": {
+   "status": 0,
+   "raw_hex": "1e000000",
+   "width_assumed": 2,
+   "value": 30
+  },
+  "14": {
+   "status": 0,
+   "raw_hex": "0a000000",
+   "width_assumed": 2,
+   "value": 10
+  },
+  "15": {
+   "status": 0,
+   "raw_hex": "50000000",
+   "width_assumed": 2,
+   "value": 80
+  },
+  "16": {
+   "status": 0,
+   "raw_hex": "08000000",
+   "width_assumed": 2,
+   "value": 8
+  },
+  "17": {
+   "status": 0,
+   "raw_hex": "28000000",
+   "width_assumed": 2,
+   "value": 40
+  },
+  "18": {
+   "status": 0,
+   "raw_hex": "00000000",
+   "width_assumed": 1,
+   "value": 0
+  },
+  "19": {
+   "status": 0,
+   "raw_hex": "50000000",
+   "width_assumed": 1,
+   "value": 80
+  },
+  "20": {
+   "status": 0,
+   "raw_hex": "05140000",
+   "width_assumed": 1,
+   "value": 5
+  },
+  "21": {
+   "status": 0,
+   "raw_hex": "00000000",
+   "width_assumed": 1,
+   "value": 0
+  },
+  "22": {
+   "status": 0,
+   "raw_hex": "00160000",
+   "width_assumed": 1,
+   "value": 0
+  },
+  "23": {
+   "status": 0,
+   "raw_hex": "00170000",
+   "width_assumed": 1,
+   "value": 0
+  },
+  "24": {
+   "status": 0,
+   "raw_hex": "00180000",
+   "width_assumed": 1,
+   "value": 0
+  },
+  "25": {
+   "status": 0,
+   "raw_hex": "c8000000",
+   "width_assumed": 2,
+   "value": 200
+  },
+  "26": {
+   "status": 0,
+   "raw_hex": "001a0000",
+   "width_assumed": 1,
+   "value": 0
+  },
+  "27": {
+   "status": 0,
+   "raw_hex": "00000000",
+   "width_assumed": 2,
+   "value": 0
+  }
+ },
+ "unmapped_keycodes": {}
+}
