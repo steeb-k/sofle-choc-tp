@@ -63,6 +63,16 @@ Encoder tabs. `process_record_user` intercepts Left/Right coming from an encoder
 
 OLED after host sleep. Suspend turns the OLED off and wake only restores the RGB; the vendor relied on `OLED_TIMEOUT`'s activity path to turn it back on, which build 5 compiled out. `suspend_wakeup_init_user` now calls `oled_on()`, with a safety net in `oled_task_user`.
 
+## Host side (LinearMouse, home Mac only)
+
+`host/linearmouse.json` is a copy of `~/.config/linearmouse/linearmouse.json` (LinearMouse 0.12.0). The pad's scheme (matched by VID/PID/serial) holds:
+
+- `scrolling.modifiers.vertical.command = pinchZoom`: Cmd + two-finger vertical scroll is a real pinch zoom.
+- `scrolling.smoothed.horizontal` (linear, no inertia) and `scrolling.reverse.horizontal = true`: horizontal wheel ticks become phased, continuous scroll events, which is enough for Safari/Chrome swipe-to-navigate to trigger. It is not 1:1: LinearMouse ends the synthetic gesture 40 ms after the last tick, so the page cannot be held half-slid ("peek"), and the firmware's 40 ms horizontal batching sits right at that edge.
+- `buttons.mappings`: Cmd + wheel right/left = Cmd+[ / Cmd+] (back/forward), Ctrl + wheel right/left = previous/next tab. The firmware's `TP_DISCRETE_H_MODS` logic makes each swipe one tick so these fire once. The 0.12.0 GUI did not list these wheel-triggered mappings even though they work; edit the JSON.
+
+Known limit and the way past it: a wheel can never say "fingers still down", so a true trackpad-like swipe with peek needs the firmware to stream touch state over the raw HID channel (it already carries Vial) to a host helper that posts phased scroll/gesture events itself. The user plans to write such a helper (possibly a LinearMouse fork); the firmware side would be a raw HID report per frame, enabled only after the helper says hello so Vial is never disturbed.
+
 ## Build
 
     ./build.sh

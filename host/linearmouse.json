@@ -1,0 +1,129 @@
+{
+  "$schema": "https://schema.linearmouse.app/0.12.0",
+  "schemes": [
+    {
+      "if": {
+        "device": {
+          "category": "mouse",
+          "productID": "0x5343",
+          "productName": "Sofle Choc",
+          "serialNumber": "vial:f64c2b3c",
+          "vendorID": "0x424c"
+        }
+      },
+      "scrolling": {
+        "modifiers": {
+          "vertical": {
+            "command": {
+              "type": "pinchZoom"
+            }
+          }
+        },
+        "smoothed": {
+          "horizontal": {
+            "preset": "linear",
+            "inertia": 0,
+            "acceleration": 0
+          },
+          "vertical": {
+            "enabled": false
+          }
+        },
+        "reverse": {
+          "vertical": false,
+          "horizontal": true
+        }
+      },
+      "buttons": {
+        "mappings": [
+          {
+            "trigger": {
+              "input": {
+                "wheel": "right"
+              },
+              "modifiers": [
+                "command"
+              ]
+            },
+            "action": {
+              "keyPress": [
+                "command",
+                "["
+              ]
+            }
+          },
+          {
+            "trigger": {
+              "input": {
+                "wheel": "left"
+              },
+              "modifiers": [
+                "command"
+              ]
+            },
+            "action": {
+              "keyPress": [
+                "command",
+                "]"
+              ]
+            }
+          },
+          {
+            "trigger": {
+              "input": {
+                "wheel": "right"
+              },
+              "modifiers": [
+                "control"
+              ]
+            },
+            "action": {
+              "keyPress": [
+                "control",
+                "shift",
+                "tab"
+              ]
+            }
+          },
+          {
+            "trigger": {
+              "input": {
+                "wheel": "left"
+              },
+              "modifiers": [
+                "control"
+              ]
+            },
+            "action": {
+              "keyPress": [
+                "control",
+                "tab"
+              ]
+            }
+          }
+        ]
+      }
+    },
+    {
+      "if": {
+        "app": "com.lujjjh.LinearMouse",
+        "device": {
+          "category": "mouse",
+          "productID": "0x5343",
+          "productName": "Sofle Choc",
+          "serialNumber": "vial:f64c2b3c",
+          "vendorID": "0x424c"
+        }
+      },
+      "scrolling": {
+        "modifiers": {
+          "vertical": {
+            "command": {
+              "type": "pinchZoomReversed"
+            }
+          }
+        }
+      }
+    }
+  ]
+}
