@@ -165,6 +165,10 @@ static const char *tp_layer_name(uint8_t layer) {
 }
 
 bool oled_task_user(void) {
+    // Dim both halves' displays after TP_IDLE_MS without input (the right half
+    // sees the left half's and the trackpad's activity via SPLIT_ACTIVITY_ENABLE).
+    // The driver only sends the contrast command when the level changes.
+    oled_set_brightness(last_input_activity_elapsed() > TP_IDLE_MS ? OLED_IDLE_BRIGHTNESS : OLED_BRIGHTNESS);
     if (!is_keyboard_master()) {
         return true;
     }

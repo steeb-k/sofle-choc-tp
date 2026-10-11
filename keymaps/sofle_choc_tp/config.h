@@ -32,7 +32,16 @@
 #undef DYNAMIC_KEYMAP_LAYER_COUNT
 #define DYNAMIC_KEYMAP_LAYER_COUNT 7
 
-#define RGB_DISABLE_WHEN_USB_SUSPENDED     // turn off effects when suspended
+// Idle behaviour (build 5): the OLED stays on as the "powered but idle" indicator
+// and the RGB goes dark after a minute without input, coming back on the next
+// key, encoder or trackpad event if RGB is enabled at all. Both still turn off
+// when the host sleeps (USB suspend).
+#define TP_IDLE_MS 60000                   // ms without input before the LEDs go dark and the OLED dims
+#define OLED_TIMEOUT 0                     // never blank the OLED on inactivity
+#define OLED_IDLE_BRIGHTNESS 1             // OLED contrast while idle (0-255; OLED_BRIGHTNESS, default 255, when active)
+#define RGB_MATRIX_TIMEOUT TP_IDLE_MS
+#define SPLIT_ACTIVITY_ENABLE              // right half learns about left-half/trackpad activity, so both halves time out together
+#define RGB_MATRIX_SLEEP                   // LEDs off during USB suspend (the vendor's RGB_DISABLE_WHEN_USB_SUSPENDED is not read by this tree)
 #define SPLIT_TRANSPORT_MIRROR             // If LED_MATRIX_KEYPRESSES or LED_MATRIX_KEYRELEASES is enabled, you also will want to enable SPLIT_TRANSPORT_MIRROR
 #define RGB_MATRIX_MAXIMUM_BRIGHTNESS 100  // limits maximum brightness of LEDs (max 255). Higher may cause the controller to crash.
 

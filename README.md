@@ -49,6 +49,10 @@ Baked layout. `keymaps[]` and `encoder_map[]` are now the layout that was on the
 
 then paste `layout/current_layout_keymap.c.txt` over the two arrays in `keymap.c`. The dump also covers macros, tap dances, combos, key overrides and QMK settings (`layout/current_layout.json`); all were empty on 2026-10-11, so nothing else is baked in.
 
+## Build 5
+
+Idle behaviour swapped. The OLED no longer blanks after 60 s (`OLED_TIMEOUT 0`); instead, after `TP_IDLE_MS` (60000) without any key, encoder or trackpad input the RGB goes dark (`RGB_MATRIX_TIMEOUT`) and both OLEDs dim to `OLED_IDLE_BRIGHTNESS` (1) in `oled_task_user()`. Any input restores both. `SPLIT_ACTIVITY_ENABLE` forwards the master's activity timestamps to the right half so both halves time out and wake together. `RGB_MATRIX_SLEEP` turns the LEDs off during USB suspend; the vendor's `RGB_DISABLE_WHEN_USB_SUSPENDED` is not read by this QMK version, so the lights previously stayed on while the host slept.
+
 ## Build
 
     ./build.sh
@@ -115,4 +119,5 @@ Note that the vendor keymap does not preserve EEPROM across builds, so flashing 
 - The keymap is intact (open Vial and compare with the saved .vil).
 - Left OLED shows kznjk, a rule, `Layer` and the layer name; the name changes while a layer key is held (kbd, 10key, mods, rgb).
 - Right OLED still shows the logo. RGB and encoders behave as before.
+- After a minute idle both halves' RGB go dark and both OLEDs dim; any key, encoder or pad touch restores them on both halves.
 - If Vial shows a wrong or scrambled layout after flashing, the stored data did not match this build's layout; use File > Load saved layout with the .vil. If the board misbehaves badly, hold the top-left key of the left half while plugging it in (bootmagic) to clear EEPROM, then load the .vil.
