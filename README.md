@@ -69,7 +69,7 @@ See [docs/linux-niri-dms.md](docs/linux-niri-dms.md): what each gesture sends on
 
 ## Host side (Niri, Linux)
 
-`host/niri-sofle.kdl` is a copy of `~/.config/niri/sofle.kdl`, included from `config.kdl`: the three-finger swipe binds (Super+Alt chords and XF86LaunchA to columns and the Overview). Super + sideways swipe is covered by DMS's existing Mod+WheelScroll binds; Ctrl + sideways swipe is handled in the firmware on Linux (no bind). Details in `docs/linux-niri-dms.md`.
+`host/niri-sofle.kdl` is a copy of `~/.config/niri/sofle.kdl`, included from `config.kdl`: the three-finger swipe binds (Super+Alt chords and XF86LaunchA to columns and the Overview). Super + sideways swipe is covered by DMS's existing Mod+WheelScroll binds; Ctrl + sideways swipe is handled in the firmware on Linux (no bind). Details in `docs/linux-niri-dms.md`. Installed on two Linux boxes (CachyOS and Debian, both Niri 26.04 + DMS); setting up another one is `cp host/niri-sofle.kdl ~/.config/niri/sofle.kdl`, append `include "sofle.kdl"` after the DMS includes at the end of `config.kdl`, and `niri validate`.
 
 ## Host side (LinearMouse, home Mac only)
 
@@ -111,7 +111,12 @@ Toolchain notes (Linux, CachyOS/Arch, October 2026): the script uses whatever `a
     sudo pacman -S arm-none-eabi-gcc arm-none-eabi-binutils arm-none-eabi-newlib
     paru -S picotool
 
-The vendor tree is pinned to a 2024 QMK that was built with GCC 8 on the Mac; the repo GCC is 16. If the build fails on a new warning-as-error or a newer-GCC quirk, the fix is usually a `-Wno-...` in `EXTRAFLAGS` or the Arch `arm-none-eabi-gcc` of an older release from the Arch Linux Archive; note it here when it happens.
+Toolchain notes (Linux, Debian forky, October 2026): `gcc-arm-none-eabi` 15.3 from apt builds the tree unchanged, with two differences the script handles on its own. Debian ships picolibc instead of newlib for `arm-none-eabi` (no `nano.specs` at all), so when `nano.specs` is missing and `--specs=picolibc.specs` works, `build.sh` passes the tree's own picolibc recipe (the one `platform.mk` only applies to RISC-V) as make overrides: `--specs=picolibc.specs` in `TOOLCHAIN_CFLAGS`, `TOOLCHAIN_LDFLAGS` without `nano.specs`, the `__heap_start`/`__heap_end` aliases, and `EXTRAFLAGS=-DUSE_PICOLIBC -include tools/picolibc_reent.h` (a forward declaration of `struct _reent` for ChibiOS's `syscalls.c`, which has no picolibc guard). Debian's `python3` has no `ensurepip` unless `python3-venv` is installed, so when it is missing the script creates `.venv` with `uv` instead (install `uv` or `python3-venv`). One-time setup:
+
+    sudo apt install gcc-arm-none-eabi binutils-arm-none-eabi picolibc-arm-none-eabi picotool
+    # plus either: sudo apt install python3-venv    or    uv on PATH
+
+The vendor tree is pinned to a 2024 QMK that was built with GCC 8 on the Mac; the Arch GCC is 16 and the Debian one 15.3 (which built it on 2026-10-11 without any `-Wno-...`). If the build fails on a new warning-as-error or a newer-GCC quirk, the fix is usually a `-Wno-...` in `EXTRAFLAGS` or the Arch `arm-none-eabi-gcc` of an older release from the Arch Linux Archive; note it here when it happens.
 
 ## Measurement build
 
@@ -147,7 +152,7 @@ Flash each half the same way with the same `.uf2` (left first). Double-tap reset
 
 If `picotool` says no device is found, the board is not in bootloader mode or the drive was already gone; double-tap reset again.
 
-On Linux, `picotool load -x out/latest.uf2` works the same (install from the AUR; it needs the Raspberry Pi udev rule or `sudo` to open the bootloader device). Without picotool, copy the file onto the `RPI-RP2` drive: DMS/udisks usually mounts it under `/run/media/$USER/RPI-RP2`; otherwise `udisksctl mount -b /dev/disk/by-label/RPI-RP2`. Then `cp out/latest.uf2 /run/media/$USER/RPI-RP2/ && sync`. The drive vanishes on its own when the board reboots; Linux handles that without the macOS hang.
+On Linux, `picotool load -x out/latest.uf2` works the same (AUR on Arch, `apt install picotool` on Debian; it needs the Raspberry Pi udev rule or `sudo` to open the bootloader device; the Debian package installs `60-picotool.rules`, which grants the `plugdev` group and the active seat). `tools/flash_linux.sh` does both halves unattended: it waits for a bootloader to show up, unmounts the `RPI-RP2` volume if udisks grabbed it, runs `picotool load -x`, then waits for the next half (`tools/flash_linux.sh [uf2] [halves] [seconds per half]`, defaults `out/latest.uf2 2 900`). Without picotool, copy the file onto the `RPI-RP2` drive: DMS/udisks usually mounts it under `/run/media/$USER/RPI-RP2`; otherwise `udisksctl mount -b /dev/disk/by-label/RPI-RP2`. Then `cp out/latest.uf2 /run/media/$USER/RPI-RP2/ && sync`. The drive vanishes on its own when the board reboots; Linux handles that without the macOS hang.
 
 Connect the TRRS cable before plugging in USB and never hot-plug it: a half-seated TRRS plug can short the power rails between the halves, and a brown-out on the USB half shows up as the QMK logo stuck on its OLED (it decided it was the slave because USB never enumerated). Unplug everything, reseat TRRS, then plug USB back in.
 

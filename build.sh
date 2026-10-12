@@ -28,6 +28,25 @@ if ! command -v arm-none-eabi-gcc >/dev/null; then
 fi
 Q=vendor/vial-qmk
 
+# libc. The pinned tree links ARM targets with newlib-nano (--specs=nano.specs),
+# which Debian's gcc-arm-none-eabi no longer ships: it defaults to picolibc.
+# Reuse the tree's own picolibc recipe (platform.mk has it, but only for
+# RISC-V): link against picolibc, alias its heap symbols to ChibiOS's, define
+# USE_PICOLIBC for syscall-fallbacks.c and forward-declare struct _reent for
+# ChibiOS's syscalls.c (tools/picolibc_reent.h). macOS/Arch with newlib are
+# untouched.
+LIBC=()
+if ! arm-none-eabi-gcc -print-file-name=nano.specs | grep -q / \
+   && arm-none-eabi-gcc --specs=picolibc.specs -E - </dev/null >/dev/null 2>&1; then
+    echo "note: no nano.specs, building against picolibc"
+    LIBC=(
+        TOOLCHAIN_CFLAGS=--specs=picolibc.specs
+        TOOLCHAIN_LDFLAGS=-Wl,--no-wchar-size-warning   # link goes through CC, which already carries the specs
+        TOOLCHAIN_LDSYMBOLS=-Wl,--defsym=__heap_start=__heap_base__,--defsym=__heap_end=__heap_end__
+        "EXTRAFLAGS=-DUSE_PICOLIBC -include $ROOT/tools/picolibc_reent.h"
+    )
+fi
+
 if [ "${1:-}" = "clean" ]; then
     if [ -d "$Q" ]; then make -C "$Q" clean; fi
     rm -rf out
@@ -52,9 +71,19 @@ fi
 
 # The virtualenv needs the vendor tree's requirements.txt, so it comes after the clone.
 if [ ! -x .venv/bin/python ]; then
-    "$PYTHON" -m venv .venv
-    .venv/bin/python -m pip install --quiet --upgrade pip
-    .venv/bin/python -m pip install --quiet -r "$Q/requirements.txt" qmk
+    if "$PYTHON" -c 'import ensurepip' 2>/dev/null; then
+        "$PYTHON" -m venv .venv
+        .venv/bin/python -m pip install --quiet --upgrade pip
+        .venv/bin/python -m pip install --quiet -r "$Q/requirements.txt" qmk
+    elif command -v uv >/dev/null; then
+        # Debian's python3 has no ensurepip unless python3-venv is installed;
+        # uv builds the same virtualenv without it (no pip inside, use uv pip).
+        uv venv --quiet --python "$PYTHON" .venv
+        uv pip install --quiet --python .venv/bin/python -r "$Q/requirements.txt" qmk
+    else
+        echo "ERROR: cannot create .venv: python3 lacks ensurepip (apt install python3-venv) and uv is not installed" >&2
+        exit 1
+    fi
 fi
 # shellcheck disable=SC1091
 . .venv/bin/activate
@@ -72,7 +101,7 @@ fi
 # variable changes, so always start from a clean object dir and no stale .uf2.
 rm -rf "$Q"/.build/*"${KB}_${KM}"* "$Q"/"${KB}_${KM}"*.uf2
 
-make -C "$Q" "$KB:$KM" CONVERT_TO=rp2040_ce ${EXTRA[@]+"${EXTRA[@]}"} -j"$NPROC"
+make -C "$Q" "$KB:$KM" CONVERT_TO=rp2040_ce ${LIBC[@]+"${LIBC[@]}"} ${EXTRA[@]+"${EXTRA[@]}"} -j"$NPROC"
 
 UF2="$(find "$Q" -maxdepth 2 -name "${KB}_${KM}*.uf2" -not -path '*/lib/*' -print0 | xargs -0 ls -t 2>/dev/null | head -n1)"
 if [ -z "$UF2" ]; then

@@ -6,9 +6,11 @@ shortcuts (plus LinearMouse); on Linux the compositor has to be told what to do
 with them. Since build 7 the firmware also detects the host OS and adapts what
 it sends, so the Linux side only needs a handful of Niri binds.
 
-State on 2026-10-11: applied on the Linux box (CachyOS, niri 26.04, DMS 1.6.1).
-The binds live in `~/.config/niri/sofle.kdl`, included from `config.kdl`; a
-copy is kept in this repo as `host/niri-sofle.kdl`. What the board actually
+State on 2026-10-11: applied on both Linux boxes (CachyOS, niri 26.04, DMS
+1.6.1; and the Debian forky desktop, niri 26.04, DMS 1.6.2, where a second
+board was flashed with build 8 the same day). On each the binds live in
+`~/.config/niri/sofle.kdl`, included from `config.kdl`; a copy is kept in this
+repo as `host/niri-sofle.kdl`. What the board actually
 sends can be checked at any time with `tools/hid_watch.py` (see the end).
 
 ## What the firmware sends
@@ -73,7 +75,7 @@ Choices behind those lines:
   its columns scroll horizontally, so a sideways swipe maps most naturally onto
   `focus-column-left/right`, which is also what DMS already binds
   `Mod+WheelScrollLeft/Right` to (so **Super + sideways swipe** needs no line of
-  its own). To think of Spaces as workspaces instead, use `focus-workspace-up`
+  its own; checked present in DMS 1.6.1 and 1.6.2's `dms/binds.kdl`). To think of Spaces as workspaces instead, use `focus-workspace-up`
   for fingers-right and `focus-workspace-down` for fingers-left.
 - **App Expose has no Niri equivalent** (no "all windows of this app" view).
   The Overview is the nearest thing, and binding it to the down swipe as well
@@ -100,9 +102,11 @@ Choices behind those lines:
   Mac, is `scroll-factor` under `mouse` (per-axis since 25.08), or
   `TP_SCROLL_UNITS_PER_LINE` in the firmware.
 - Nothing is needed for taps, drag or the encoder.
-- DMS's own `dms/input.kdl` is not included from this `config.kdl`, so its
-  `mouse { accel-speed 0.0 }` does not apply; the `touchpad` section there is
-  for the laptop's pad, not the Sofle.
+- DMS's own `dms/input.kdl` is not included from the CachyOS `config.kdl`, so
+  its `mouse { accel-speed 0.0 }` does not apply there; the `touchpad` section
+  is for the laptop's pad, not the Sofle. The Debian box does include it, which
+  only sets the pad's pointer acceleration to flat and leaves `natural-scroll`
+  off for mice, so nothing needed changing.
 
 ## DankMaterialShell
 
