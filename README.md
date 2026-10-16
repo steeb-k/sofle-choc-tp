@@ -28,12 +28,12 @@ Three-finger swipes. A session that reaches three fingers sums the chip's relati
 
 | Finger moves | Code | Default key (`config.h`) | macOS action |
 |---|---|---|---|
-| right | BUTTON5 | `TP_SWIPE_RIGHT_KEY` = `LCTL(KC_LEFT)` | Space to the left (like the macOS four-finger swipe) |
-| left | BUTTON4 | `TP_SWIPE_LEFT_KEY` = `LCTL(KC_RGHT)` | Space to the right |
+| right | BUTTON5 | `TP_SWIPE_RIGHT_KEY` = `LALT(KC_LEFT)` | Space to the left (like the macOS four-finger swipe) |
+| left | BUTTON4 | `TP_SWIPE_LEFT_KEY` = `LALT(KC_RGHT)` | Space to the right |
 | up | BUTTON6 | `TP_SWIPE_UP_KEY` = `KC_MISSION_CONTROL` | Mission Control |
 | down | BUTTON7 | `TP_SWIPE_DOWN_KEY` = `LCTL(KC_DOWN)` | App Expose |
 
-The defaults emulate the macOS four-finger swipes and rely on the default Mission Control shortcuts (System Settings > Keyboard > Keyboard Shortcuts > Mission Control). To change an action, edit the four `TP_SWIPE_*_KEY` defines in `config.h` (any keycode `tap_code16()` accepts); for browser back/forward use `LGUI(KC_LBRC)` / `LGUI(KC_RBRC)`. If up and down feel inverted, swap the UP and DOWN keys. The tunables are `TP_SWIPE3_MIN_UNITS_X` and `TP_SWIPE3_MIN_UNITS_Y` (smaller = a shorter swipe fires; horizontal is lower because three fingers leave little room on a 43 mm wide pad) and `TP_SWIPE3_MAX_MS`. The measurement build prints `E swipe L/R/U/D` when one fires.
+The defaults emulate the macOS four-finger swipes. Up and down rely on the default Mission Control shortcuts (System Settings > Keyboard > Keyboard Shortcuts > Mission Control); left and right send Alt+Left/Right since build 9 (they were Ctrl+Left/Right up to build 8), so "Move left/right a space" must be rebound from Ctrl+arrow to Option+arrow in the same settings pane. To change an action, edit the four `TP_SWIPE_*_KEY` defines in `config.h` (any keycode `tap_code16()` accepts); for browser back/forward use `LGUI(KC_LBRC)` / `LGUI(KC_RBRC)`. If up and down feel inverted, swap the UP and DOWN keys. The tunables are `TP_SWIPE3_MIN_UNITS_X` and `TP_SWIPE3_MIN_UNITS_Y` (smaller = a shorter swipe fires; horizontal is lower because three fingers leave little room on a 43 mm wide pad) and `TP_SWIPE3_MAX_MS`. The measurement build prints `E swipe L/R/U/D` when one fires.
 
 EEPROM hook fix. Build 2's `via_init_kb()` tested `eeconfig_is_enabled()`, which in this tree also requires `via_eeprom_is_valid()`. On a new build that is false until this very hook re-stamps it, so the condition could never be true and the stored layout was wiped on flashing. The condition is now only `eeconfig_read_user() == SCTP_LAYOUT_MARKER && !via_eeprom_is_valid()`. A blank EEPROM has no marker and initialises normally; a deliberate reset (bootmagic, `QK_CLEAR_EEPROM`, Vial reset) runs `eeconfig_init`, which zeroes the marker. `via_init()` runs before `quantum_init()` in `keyboard_init()`, so the re-stamp happens first. Note the build-2 flash that wiped the layout also wrote the marker, so the next flash of build 3 should preserve the layout (load the .vil once after the build-2 wipe first).
 
@@ -83,7 +83,15 @@ Known limit and the way past it: a wheel can never say "fingers still down", so 
 
 ## Build 7
 
-Host-OS-aware swipe keys. `OS_DETECTION_ENABLE` (QMK's USB enumeration fingerprint) lets `pointing_device_task_user` pick the three-finger swipe key set: macOS/iOS/unknown use the original Ctrl+Left/Right, Mission Control, Ctrl+Down; Linux uses Super+Alt+Left/Right/Down with the Mission Control key unchanged (`TP_SWIPE_*_KEY_LINUX`, bindable in Niri without stealing Ctrl+arrow word movement; see `docs/linux-niri-dms.md`); Windows uses Ctrl+Win+Left/Right and Win+Tab (`TP_SWIPE_*_KEY_WIN`, untested). Detection settles about a quarter second after enumeration; before that the macOS set is used. The left OLED shows the detected OS (`mac`, `linux`, `win`, `ios`, `os ?`) under the layer name. Detection runs only on the USB half and re-runs on every replug or host reboot, not on a KVM switch that keeps the device enumerated.
+Host-OS-aware swipe keys. `OS_DETECTION_ENABLE` (QMK's USB enumeration fingerprint) lets `pointing_device_task_user` pick the three-finger swipe key set: macOS/iOS/unknown use Alt+Left/Right (Ctrl+Left/Right up to build 8), Mission Control, Ctrl+Down; Linux uses Super+Alt+Left/Right/Down with the Mission Control key unchanged (`TP_SWIPE_*_KEY_LINUX`, bindable in Niri without stealing Ctrl+arrow word movement; see `docs/linux-niri-dms.md`); Windows uses Ctrl+Win+Left/Right and Win+Tab (`TP_SWIPE_*_KEY_WIN`, untested). Detection settles about a quarter second after enumeration; before that the macOS set is used. The left OLED shows the detected OS (`mac`, `linux`, `win`, `ios`, `os ?`) under the layer name. Detection runs only on the USB half and re-runs on every replug or host reboot, not on a KVM switch that keeps the device enumerated.
+
+## Build 9
+
+Three-finger swipe left/right on macOS now send Alt+Right / Alt+Left (`TP_SWIPE_LEFT_KEY` / `TP_SWIPE_RIGHT_KEY`, were Ctrl+Right / Ctrl+Left). Rebind "Move left a space" / "Move right a space" in System Settings > Keyboard > Keyboard Shortcuts > Mission Control from Ctrl+arrow to Option+arrow, or the swipes do nothing. The Linux (Super+Alt) and Windows (Ctrl+Win) sets, the up/down keys and the encoder's Ctrl+Tab are unchanged.
+
+Horizontal scroll flipped on macOS. The build 8 per-OS flip now has a macOS pair too (`TP_SCROLL_FLIP_V_MAC 0`, `TP_SCROLL_FLIP_H_MAC 1`), used for macOS, iOS and a not-yet-detected host: vertical stays natural as the pad sends it, horizontal is reversed. This flip happens before LinearMouse sees the wheel, so on the Mac check `scrolling.reverse.horizontal` in `~/.config/linearmouse/linearmouse.json` (set to true in build 6; with the firmware flip it would reverse horizontal back again) and the Cmd + wheel left/right back/forward mappings, whose sides swap with the tick sign.
+
+Baked layout refreshed. `keymaps[]` and `encoder_map[]` are the layout read from the board on 2026-10-16 (`layout/current_layout.json`; the 2026-10-11 dump is kept in `layout/backup-20261016/`). The two tap dances and two macros in that layout live in Vial's EEPROM only and are not baked.
 
 ## Build 8
 

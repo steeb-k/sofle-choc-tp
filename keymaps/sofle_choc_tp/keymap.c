@@ -75,7 +75,7 @@ report_mouse_t pointing_device_task_user(report_mouse_t mouse_report) {
         switch (detected_host_os()) {
             case OS_LINUX:   flip_v = TP_SCROLL_FLIP_V_LINUX; flip_h = TP_SCROLL_FLIP_H_LINUX; break;
             case OS_WINDOWS: flip_v = TP_SCROLL_FLIP_V_WIN;   flip_h = TP_SCROLL_FLIP_H_WIN;   break;
-            default: break;  // macOS, iOS, or not yet known: as the pad sends it
+            default:         flip_v = TP_SCROLL_FLIP_V_MAC;   flip_h = TP_SCROLL_FLIP_H_MAC;   break;  // macOS, iOS, or not yet known
         }
         if (flip_v) mouse_report.v = (int8_t)-mouse_report.v;  // never -128: the pad caps lines at +/-8
         if (flip_h) mouse_report.h = (int8_t)-mouse_report.h;
@@ -143,23 +143,23 @@ report_mouse_t pointing_device_task_user(report_mouse_t mouse_report) {
 }
 #endif // POINTING_DEVICE_ENABLE
 
-// Default keymap, baked from the live Vial layout read on 2026-10-11 with
+// Default keymap, baked from the live Vial layout read on 2026-10-16 with
 // tools/dump_layout.py (layout/current_layout.json). Vial's EEPROM copy still
 // takes precedence day to day; this is what an EEPROM reset comes back to.
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 [0] = LAYOUT(
-  KC_GRV, KC_1, KC_2, KC_3, KC_4, KC_5,   KC_6, KC_7, KC_8, KC_9, KC_0, KC_MINS,
-  KC_ESC, KC_Q, KC_W, KC_E, KC_R, KC_T,   KC_Y, KC_U, KC_I, KC_O, KC_P, KC_BSPC,
-  KC_TAB, KC_A, KC_S, KC_D, KC_F, KC_G,   KC_H, KC_J, KC_K, KC_L, KC_SCLN, KC_QUOT,
+  TD(0), KC_1, KC_2, KC_3, KC_4, KC_5,   KC_6, KC_7, KC_8, KC_9, KC_0, KC_MINS,
+  KC_TAB, KC_Q, KC_W, KC_E, KC_R, KC_T,   KC_Y, KC_U, KC_I, KC_O, KC_P, KC_EQL,
+  KC_LGUI, KC_A, LGUI_T(KC_S), LALT_T(KC_D), LCTL_T(KC_F), KC_G,   KC_H, RCTL_T(KC_J), RALT_T(KC_K), RGUI_T(KC_L), RSFT_T(KC_SCLN), KC_QUOT,
   KC_LSFT, KC_Z, KC_X, KC_C, KC_V, KC_B, KC_MUTE,   RM_TOGG, KC_N, KC_M, KC_COMM, KC_DOT, KC_SLSH, KC_BSLS,
-  MO(1), KC_LALT, KC_LCTL, KC_ENT, KC_LGUI,   MO(3), KC_SPC, KC_RCTL, KC_RALT, HYPR(KC_TAB)
+  TD(1), KC_LCTL, MO(1), KC_BSPC, KC_ENT,   MO(3), KC_SPC, KC_DEL, MO(2), HYPR(KC_TAB)
 ),
 [1] = LAYOUT(
   KC_GRV, KC_1, KC_2, KC_3, KC_4, KC_5,   KC_PSLS, KC_PAST, KC_PSLS, KC_LBRC, KC_RBRC, KC_EQL,
   KC_ESC, KC_Q, KC_W, KC_F, KC_P, KC_G,   KC_P7, KC_P8, KC_P9, KC_PAST, KC_SCLN, KC_DEL,
   KC_TAB, KC_A, KC_R, KC_S, KC_T, KC_D,   KC_P4, KC_P5, KC_P6, KC_PMNS, KC_O, KC_QUOT,
   KC_LSFT, KC_Z, KC_X, KC_C, KC_V, KC_B, KC_MUTE,   KC_NO, KC_P1, KC_P2, KC_P3, KC_PPLS, KC_SLSH, KC_RSFT,
-  KC_LGUI, KC_LALT, KC_LCTL, _______, KC_ENT,   KC_PENT, KC_P0, KC_PDOT, KC_PENT, KC_PENT
+  TO(0), KC_LALT, KC_LCTL, KC_BSPC, KC_ENT,   KC_PENT, KC_P0, KC_PDOT, KC_PENT, KC_PENT
 ),
 [2] = LAYOUT(
   _______, KC_F1, KC_F2, KC_F3, KC_F4, KC_F5,   KC_F6, KC_F7, KC_F8, KC_F9, KC_F10, KC_F11,
@@ -201,7 +201,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 const uint16_t PROGMEM encoder_map[][NUM_ENCODERS][2] = {
     [0] = { ENCODER_CCW_CW(KC_UP, KC_DOWN), ENCODER_CCW_CW(KC_LEFT, KC_RGHT) },
     [1] = { ENCODER_CCW_CW(KC_VOLD, KC_VOLU), ENCODER_CCW_CW(KC_VOLD, KC_VOLU) },
-    [2] = { ENCODER_CCW_CW(_______, _______), ENCODER_CCW_CW(_______, _______) },
+    [2] = { ENCODER_CCW_CW(RCTL_T(MS_WHLD), RCTL_T(MS_WHLU)), ENCODER_CCW_CW(_______, _______) },
     [3] = { ENCODER_CCW_CW(RM_HUEU, RM_HUED), ENCODER_CCW_CW(RM_VALU, RM_VALD) },
     [4] = { ENCODER_CCW_CW(_______, _______), ENCODER_CCW_CW(_______, _______) },
     [5] = { ENCODER_CCW_CW(_______, _______), ENCODER_CCW_CW(_______, _______) },

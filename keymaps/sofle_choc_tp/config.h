@@ -107,9 +107,11 @@
 // Named by the direction the fingers move. Defaults emulate the macOS
 // four-finger swipes: left/right switch Spaces (fingers left = the Space to the
 // right, as with natural scrolling), up = Mission Control, down = App Expose.
-// These need the default Mission Control shortcuts enabled in System Settings.
-#define TP_SWIPE_LEFT_KEY     LCTL(KC_RGHT)
-#define TP_SWIPE_RIGHT_KEY    LCTL(KC_LEFT)
+// Up/down need the default Mission Control shortcuts enabled in System Settings;
+// left/right are Alt+arrow since build 9 (Ctrl+arrow before), so "Move left/right
+// a space" must be rebound to Option+arrow there.
+#define TP_SWIPE_LEFT_KEY     LALT(KC_RGHT)
+#define TP_SWIPE_RIGHT_KEY    LALT(KC_LEFT)
 #define TP_SWIPE_UP_KEY       KC_MISSION_CONTROL
 #define TP_SWIPE_DOWN_KEY     LCTL(KC_DOWN)   // App Expose
 // Build 7: OS detection (OS_DETECTION_ENABLE) picks a key set per host. The macOS
@@ -132,6 +134,11 @@
 // backwards (user-reported, 2026-10-11), so vertical is flipped there.
 // Horizontal is flipped there too (confirmed right on 2026-10-11).
 // tools/hid_watch.py prints the wheel sign per tick. Windows is a guess.
+// Build 9: macOS (also iOS and a not-yet-detected host) gets its own pair;
+// horizontal is flipped there too (user-requested 2026-10-16), vertical stays
+// natural as the pad sends it.
+#define TP_SCROLL_FLIP_V_MAC    0
+#define TP_SCROLL_FLIP_H_MAC    1
 #define TP_SCROLL_FLIP_V_LINUX  1
 #define TP_SCROLL_FLIP_H_LINUX  1
 #define TP_SCROLL_FLIP_V_WIN    0

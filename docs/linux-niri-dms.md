@@ -20,8 +20,8 @@ sends can be checked at any time with `tools/hid_watch.py` (see the end).
 | 1 / 2 / 3-finger tap | button 1 / 2 / 3 | same |
 | press 1/4 s then move | button 1 held (drag) | same |
 | two-finger scroll | wheel, natural direction on both axes | wheel, both axes flipped back by the master (build 8, see below) |
-| three-finger swipe, fingers left | `Ctrl+Right` (next Space) | `Super+Alt+Right` |
-| three-finger swipe, fingers right | `Ctrl+Left` (previous Space) | `Super+Alt+Left` |
+| three-finger swipe, fingers left | `Alt+Right` (next Space; `Ctrl+Right` up to build 8) | `Super+Alt+Right` |
+| three-finger swipe, fingers right | `Alt+Left` (previous Space; `Ctrl+Left` up to build 8) | `Super+Alt+Left` |
 | three-finger swipe up | consumer 0x29F "AC Desktop Show All Windows" (QMK `KC_MISSION_CONTROL`) | same key; the kernel maps it to `KEY_SCALE`, xkb calls it **`XF86LaunchA`** |
 | three-finger swipe down | `Ctrl+Down` (App Expose) | `Super+Alt+Down` |
 | Ctrl + right encoder | `Ctrl+Tab` / `Ctrl+Shift+Tab` | same |
