@@ -195,6 +195,8 @@ static uint8_t   sess_maxf;
 static int16_t   sess_ax0, sess_ay0, sess_drift1;
 static int16_t   sess_arm_ax, sess_arm_ay;
 static uint8_t   sess_arm_frames;  // frames since the rolling drag reference was set
+static int16_t   sess_hold_dx, sess_hold_dy;     // rel motion held back while armed (build 12)
+static int16_t   sess_replay_x, sess_replay_y;   // held-back motion still to be sent after drag start
 static uint16_t  sess_lines;       // non-zero wheel lines emitted this session
 static uint8_t   prev_n, frames_since_change, zero_frames, fail_count;
 static uint16_t  sess_motion;
@@ -283,6 +285,8 @@ static void tp_gesture(const tp_meas_data_t *md, report_mouse_t *report) {
         sess_swipe_fired      = false;
         sess_mode        = TP_PENDING;
         acc_v = acc_h = 0;
+        sess_hold_dx = sess_hold_dy = 0;
+        sess_replay_x = sess_replay_y = 0;
 #ifdef TP_MEASURE_PRINT
         if (tp_banner_pending) {
             tp_banner_due = true; // printed at the end of get_report
@@ -333,30 +337,55 @@ static void tp_gesture(const tp_meas_data_t *md, report_mouse_t *report) {
                     sess_arm_ax     = ax;
                     sess_arm_ay     = ay;
                     sess_arm_frames = 0;
+                    sess_hold_dx = sess_hold_dy = 0;
                     TP_EV("arm");
                 }
             } else if (sess_mode == TP_ARMED) {
+                // Build 12: while armed the cursor does not move. The motion is
+                // held back, so when the drag starts the button goes down where
+                // the finger rested, and the held-back motion is replayed on the
+                // following frames so the drag catches up with the finger. Before
+                // this, the first TP_DRAG_START_UNITS of a drag moved the cursor
+                // without the button and the selection began that far in.
+                sess_hold_dx += rx;
+                sess_hold_dy += ry;
                 if (MAX(tp_abs16(ax - sess_arm_ax), tp_abs16(ay - sess_arm_ay)) > TP_DRAG_START_UNITS) {
                     sess_mode      = TP_DRAGGING; // button goes down with zero motion first
                     swallow_motion = true;
+                    sess_replay_x  = sess_hold_dx;
+                    sess_replay_y  = sess_hold_dy;
                     TP_EV("drag_start");
                 } else if (++sess_arm_frames >= 20) {
                     // Rolling reference (every 200 ms): a resting finger creeps
                     // slowly (measured <= 7 units per 200 ms) and never reaches
-                    // the threshold, while a real drag passes it easily.
+                    // the threshold, while a real drag passes it easily. The
+                    // creep is dropped with the reference.
                     sess_arm_ax     = ax;
                     sess_arm_ay     = ay;
                     sess_arm_frames = 0;
+                    sess_hold_dx = sess_hold_dy = 0;
                 }
             }
         }
     }
 
     // Cursor motion: one finger only, not while scrolling.
-    bool dead_zone = sess_active && sess_mode == TP_PENDING && sess_drift1 <= TP_DEAD_ZONE_UNITS;
+    bool dead_zone = sess_active && ((sess_mode == TP_PENDING && sess_drift1 <= TP_DEAD_ZONE_UNITS) || sess_mode == TP_ARMED);
     if (n == 1 && !scroll && !swallow_motion && !twitch && !dead_zone) {
-        report->x = CONSTRAIN_HID_XY(rx);
-        report->y = CONSTRAIN_HID_XY(ry);
+        int16_t ox = rx, oy = ry;
+        if (sess_mode == TP_DRAGGING) {
+            // Replay the motion held back while armed; what does not fit the
+            // HID range is carried to the next frame.
+            ox += sess_replay_x;
+            oy += sess_replay_y;
+            report->x     = CONSTRAIN_HID_XY(ox);
+            report->y     = CONSTRAIN_HID_XY(oy);
+            sess_replay_x = ox - report->x;
+            sess_replay_y = oy - report->y;
+        } else {
+            report->x = CONSTRAIN_HID_XY(ox);
+            report->y = CONSTRAIN_HID_XY(oy);
+        }
     }
     // Scroll: exactly two fingers; three or more suppress it for the session.
     if (sess_active && scroll && n == 2 && sess_maxf < 3) {
@@ -464,6 +493,12 @@ report_mouse_t pointing_device_driver_get_report(report_mouse_t mouse_report) {
     if (timer_elapsed32(tp_poll_timer) < TP_POLL_INTERVAL_MS) {
         return tp_last; // same report_id: the master treats it as a duplicate
     }
+    // The poll period is counted from the start of the read. A build-12
+    // experiment counted it from the read's return (so the next poll would land
+    // on the chip's comms window and the clock-stretch stall would vanish); it
+    // made drags start noticeably later, for reasons not understood, and was
+    // reverted the same day. The RGB blink is handled on the keymap side instead
+    // (matrix_slave_scan_user).
     tp_poll_timer = timer_read32();
 #ifdef TP_MEASURE_PRINT
     if (tp_banner_pending && timer_elapsed32(tp_banner_timer) >= 10000) {

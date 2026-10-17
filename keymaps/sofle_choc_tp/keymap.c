@@ -64,6 +64,27 @@ static void sctp_apply_settings_defaults(void) {
 }
 #endif
 
+#if defined(SPLIT_ACTIVITY_ENABLE) && !defined(DISABLE_SYNC_TIMER)
+// Build 12: right-half RGB blink while the pad moves. The master resends its
+// clock every 100 ms (sync_timer, +2 ms) and its last-activity timestamps on
+// every change (SPLIT_ACTIVITY_ENABLE). This half applies both here in its main
+// loop (transport_slave, just before this hook), and that loop can be blocked
+// in the pad's I2C read while the IQS572 clock-stretches to the end of its
+// cycle. A clock sync applied that late leaves this half's clock behind the
+// master's; the next pointing-activity stamp (every 10 ms while the pad moves)
+// is then "in the future", last_input_activity_elapsed() wraps to ~4e9 ms,
+// rgb_matrix_task reads that as past RGB_MATRIX_TIMEOUT and flushes a black
+// frame (and oled_task_user dims the OLED) until the next sync, up to 100 ms.
+// A stamp from the future can only mean a skewed clock, so pull it back to now.
+// tp_driver.c also phase-locks its polls to the chip's window (shorter stalls).
+void matrix_slave_scan_user(void) {
+    if (last_input_activity_elapsed() > 0x80000000u) {
+        uint32_t now = sync_timer_read32();
+        set_activity_timestamps(now, now, now);
+    }
+}
+#endif
+
 void keyboard_post_init_user(void) {
     if (eeconfig_read_user() != SCTP_LAYOUT_MARKER) {
         // No marker: the EEPROM is blank or was just reset, so everything in it
