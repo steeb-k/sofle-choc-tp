@@ -45,7 +45,7 @@ axes for every host, which is what the Mac wanted. On Linux the vertical
 direction came out backwards, so the master flips vertical back on a Linux host
 (`TP_SCROLL_FLIP_V_LINUX 1` in `config.h`). Horizontal was flipped as well in
 builds 8 and 9 (`TP_SCROLL_FLIP_H_LINUX 1`); on 2026-10-17 the two axes
-disagreed on the Debian box, so build 10 sets it to 0 and horizontal goes
+disagreed, so build 10 sets it to 0 and horizontal goes
 through as the pad sends it. Niri's own `natural-scroll` must stay off for mice either
 way (below).
 

@@ -133,7 +133,7 @@
 // axis back (1) for the hosts below. On Linux the vertical direction came out
 // backwards (user-reported, 2026-10-11), so vertical is flipped there.
 // Horizontal was flipped there too from build 8 to build 9; build 10 leaves it as
-// the pad sends it (user-reported wrong on 2026-10-17: the two axes disagreed).
+// the pad sends it (user-reported on 2026-10-17: the two axes disagreed).
 // tools/hid_watch.py prints the wheel sign per tick. Windows is a guess.
 // Build 9: macOS (also iOS and a not-yet-detected host) gets its own pair;
 // horizontal is flipped there too (user-requested 2026-10-16), vertical stays

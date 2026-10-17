@@ -143,10 +143,9 @@ report_mouse_t pointing_device_task_user(report_mouse_t mouse_report) {
 }
 #endif // POINTING_DEVICE_ENABLE
 
-// Default keymap, baked from the live Vial layout of the Debian-box board read on
-// 2026-10-17 with tools/dump_layout.py (layout/debian/current_layout.json; the
-// CachyOS-box board's own layout is under layout/cachyos/). Vial's EEPROM copy
-// still takes precedence day to day; this is what an EEPROM reset comes back to.
+// Default keymap, baked from the live Vial layout read on 2026-10-17 with
+// tools/dump_layout.py (layout/current_layout.json). Vial's EEPROM copy still
+// takes precedence day to day; this is what an EEPROM reset comes back to.
 // TD(1) on the base layer is a Vial tap dance (tap MO(1), double-tap TG(1)); it
 // lives in EEPROM only, so after a reset that key is dead until re-created in Vial.
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {

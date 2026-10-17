@@ -6,21 +6,12 @@ How we know it is `vial`: a picotool full-flash image of the shipped firmware ma
 
 ## Layouts
 
-Two boards, two layouts, on purpose. Each is read from the live board with `tools/dump_layout.py --out layout/<board>` and drawn by `tools/render_layout.py` (run automatically by the dump; the pictures below are `layout/<board>/png/layer*.png`). Tap-hold keys show the tap on top and the hold underneath; `▽` is transparent (falls through to the layer below). The firmware's baked fallback is the Debian board's layout since build 10.
+The layout is read from the live board with `tools/dump_layout.py` and drawn by `tools/render_layout.py` (run automatically by the dump; the pictures are `layout/png/layer*.png`). Tap-hold keys show the tap on top and the hold underneath; `▽` is transparent (falls through to the layer below). This is also the layout baked into the firmware since build 10. Older dumps are kept under `layout/backup-<date>/`.
 
-### Debian box (baked default)
-
-![Debian board, layer 0](layout/debian/png/layer0.png)
-![Debian board, layer 1](layout/debian/png/layer1.png)
-![Debian board, layer 2](layout/debian/png/layer2.png)
-![Debian board, layer 3](layout/debian/png/layer3.png)
-
-### CachyOS box
-
-![CachyOS board, layer 0](layout/cachyos/png/layer0.png)
-![CachyOS board, layer 1](layout/cachyos/png/layer1.png)
-![CachyOS board, layer 2](layout/cachyos/png/layer2.png)
-![CachyOS board, layer 3](layout/cachyos/png/layer3.png)
+![Layer 0](layout/png/layer0.png)
+![Layer 1](layout/png/layer1.png)
+![Layer 2](layout/png/layer2.png)
+![Layer 3](layout/png/layer3.png)
 
 ## What changed
 
@@ -65,7 +56,7 @@ Baked layout. `keymaps[]` and `encoder_map[]` are now the layout that was on the
 
     DYLD_FALLBACK_LIBRARY_PATH=/opt/homebrew/lib .venv/bin/python tools/dump_layout.py
 
-then paste `current_layout_keymap.c.txt` over the two arrays in `keymap.c`. The dump also covers macros, tap dances, combos, key overrides and QMK settings (`current_layout.json`); all were empty on 2026-10-11, so nothing else is baked in. Since build 10 the dumps live per board (see Build 10): pass `--out layout/<board>`.
+then paste `current_layout_keymap.c.txt` over the two arrays in `keymap.c`. The dump also covers macros, tap dances, combos, key overrides and QMK settings (`current_layout.json`); all were empty on 2026-10-11, so nothing else is baked in. The dump also redraws `layout/png/` (see Layouts at the top).
 
 ## Build 5
 
@@ -113,11 +104,9 @@ Baked layout refreshed. `keymaps[]` and `encoder_map[]` are the layout read from
 
 ## Build 10
 
-Baked layout is the Debian-box board's. `keymaps[]` and `encoder_map[]` are the layout read from that board on 2026-10-17 (`layout/debian/current_layout.json`): home-row mods on S/D/F and J/K/L/;, Delete bottom-left, thumbs TD(1) / MO(2) / MO(3) / Backspace / Enter and MO(3) / Space / `[` / `]` / Hyper+Tab, layer 1 a right-hand numpad with Home/End/PgUp/PgDn, layer 2 F-keys and symbols, layer 3 nav and editing. TD(1) (tap MO(1), double-tap TG(1)) is a Vial tap dance in EEPROM and is not baked, so after an EEPROM reset that thumb key is dead until it is re-created in Vial. The QMK settings in Vial are per board too and are not baked (on this board: permissive hold on, tapping term 200 ms, as of 2026-10-17).
+Baked layout refreshed. `keymaps[]` and `encoder_map[]` are the layout read from the board on 2026-10-17 (`layout/current_layout.json`): home-row mods on S/D/F and J/K/L/;, Delete bottom-left, thumbs TD(1) / MO(2) / MO(3) / Backspace / Enter and MO(3) / Space / `[` / `]` / Hyper+Tab, a right-hand numpad with Home/End/PgUp/PgDn on layer 1, F-keys and symbols on layer 2, nav and editing on layer 3. TD(1) (tap MO(1), double-tap TG(1)) is a Vial tap dance in EEPROM and is not baked, so after an EEPROM reset that thumb key is dead until it is re-created in Vial. The QMK settings in Vial are not baked either (permissive hold on, tapping term 200 ms, as of 2026-10-17). The 2026-10-16 dump that build 9 baked is kept in `layout/backup-20261017/`.
 
-Two boards, two layouts. The two keyboards are used for different things and keep different layouts on purpose. Each board's dump lives in its own directory: `layout/debian/` (the board on the Debian box) and `layout/cachyos/` (the board on the CachyOS box, dump of 2026-10-16, the layout build 9 baked). Re-dump with `.venv/bin/python tools/dump_layout.py --out layout/<board>` (which also redraws `layout/<board>/png/`, see Layouts at the top) and diff the two `current_layout_keymap.c.txt` files to see how they differ. The firmware is the same for both; only the baked fallback follows the Debian board. `layout/backup-20261016/` keeps the 2026-10-11 dump.
-
-Linux horizontal scroll no longer flipped. Build 8 flipped both axes back on a Linux host; on 2026-10-17 the two axes disagreed on the Debian box, so `TP_SCROLL_FLIP_H_LINUX` is now 0 and only vertical is flipped there. macOS and Windows are unchanged.
+Linux horizontal scroll no longer flipped. Build 8 flipped both axes back on a Linux host; on 2026-10-17 the two axes disagreed, so `TP_SCROLL_FLIP_H_LINUX` is now 0 and only vertical is flipped there. macOS and Windows are unchanged.
 
 ## Build 8
 

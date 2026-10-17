@@ -7,8 +7,8 @@ two encoders. Keycodes are shortened to what is printed on a keycap; tap-hold
 keys show the tap on top and the hold underneath; tap dances are expanded from
 the dump. Layers that are entirely transparent are skipped.
 
-Usage: .venv/bin/python tools/render_layout.py layout/<board>/current_layout.json
-       [--out layout/<board>/png] [--vial keymaps/sofle_choc_tp/vial.json]
+Usage: .venv/bin/python tools/render_layout.py layout/current_layout.json
+       [--out layout/png] [--vial keymaps/sofle_choc_tp/vial.json] [--title prefix]
 """
 import argparse, json, math, os, re, sys
 
@@ -267,7 +267,7 @@ def main():
     ap.add_argument('dump')
     ap.add_argument('--out')
     ap.add_argument('--vial', default=os.path.join(ROOT, 'keymaps', 'sofle_choc_tp', 'vial.json'))
-    ap.add_argument('--title', default=None, help='prefix for the image titles (default: the dump directory name)')
+    ap.add_argument('--title', default='', help='optional prefix for the image titles')
     args = ap.parse_args()
     out = args.out or os.path.join(os.path.dirname(os.path.abspath(args.dump)), 'png')
     os.makedirs(out, exist_ok=True)
@@ -276,12 +276,11 @@ def main():
     keys = [k for k in parse_kle(vial['layouts']['keymap']) if not k['decal']]
     pts = [pt for k in keys for pt in key_polygon(k)]
     bounds = (min(p[0] for p in pts), min(p[1] for p in pts), max(p[0] for p in pts), max(p[1] for p in pts))
-    board = args.title or os.path.basename(os.path.dirname(os.path.abspath(args.dump)))
     written = []
     for layer in range(d['layer_count']):
         if layer and layer_is_empty(d['keymap_names'], d['encoders_names'], layer):
             continue
-        title = '%s: layer %d%s' % (board, layer, ' (%s)' % LAYER_NAMES[layer] if layer in LAYER_NAMES else '')
+        title = '%slayer %d%s' % (args.title + ': ' if args.title else '', layer, ' (%s)' % LAYER_NAMES[layer] if layer in LAYER_NAMES else '')
         img = render_layer(keys, layer, d['keymap_names'], d['encoders_names'], d['tap_dance'], title, bounds)
         p = os.path.join(out, 'layer%d.png' % layer)
         img.save(p, optimize=True)
