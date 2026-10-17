@@ -5,8 +5,8 @@ Only *_get_* / query commands are ever sent; send() enforces a whitelist and
 refuses anything else, so the keyboard's EEPROM cannot be modified.
 
 Usage: .venv/bin/python tools/dump_layout.py [--vil ~/Documents/sofle-mine.vil]
-Outputs: layout/current_layout.json, layout/current_layout_keymap.c.txt,
-         layout/diff_vs_backup.txt (if --vil given / file exists)
+Outputs (in --out, use layout/<board>): current_layout.json, current_layout_keymap.c.txt,
+         diff_vs_backup.txt (if --vil given / file exists), png/layer*.png via tools/render_layout.py
 """
 import argparse, json, os, re, sys, time
 
@@ -308,7 +308,9 @@ for _i in range(9, 18):
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument('--vil', default=os.path.expanduser('~/Documents/sofle-mine.vil'))
-    ap.add_argument('--out', default=os.path.join(ROOT, 'layout'))
+    ap.add_argument('--out', default=os.path.join(ROOT, 'layout'),
+                    help='directory for the dump; use layout/<board> (debian, cachyos)')
+    ap.add_argument('--no-png', action='store_true', help='skip rendering layout/<board>/png/')
     args = ap.parse_args()
     os.makedirs(args.out, exist_ok=True)
 
@@ -536,6 +538,12 @@ def main():
     print(json.dumps(out['counts']))
     print('unmapped:', out['unmapped_keycodes'])
     print('\n'.join(rep))
+
+    if not args.no_png:
+        # Redraw the per-layer pictures next to the dump (tools/render_layout.py).
+        import subprocess
+        subprocess.run([sys.executable, os.path.join(ROOT, 'tools', 'render_layout.py'),
+                        os.path.join(args.out, 'current_layout.json')], check=False)
 
 
 if __name__ == '__main__':

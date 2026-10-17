@@ -4,6 +4,24 @@ A small QMK/Vial overlay for a Sofle Choc 2.1 (RP2040-CE controllers, built with
 
 How we know it is `vial`: a picotool full-flash image of the shipped firmware matched the `vial` build byte-for-byte, while `vialtrack` matched about 7%.
 
+## Layouts
+
+Two boards, two layouts, on purpose. Each is read from the live board with `tools/dump_layout.py --out layout/<board>` and drawn by `tools/render_layout.py` (run automatically by the dump; the pictures below are `layout/<board>/png/layer*.png`). Tap-hold keys show the tap on top and the hold underneath; `▽` is transparent (falls through to the layer below). The firmware's baked fallback is the Debian board's layout since build 10.
+
+### Debian box (baked default)
+
+![Debian board, layer 0](layout/debian/png/layer0.png)
+![Debian board, layer 1](layout/debian/png/layer1.png)
+![Debian board, layer 2](layout/debian/png/layer2.png)
+![Debian board, layer 3](layout/debian/png/layer3.png)
+
+### CachyOS box
+
+![CachyOS board, layer 0](layout/cachyos/png/layer0.png)
+![CachyOS board, layer 1](layout/cachyos/png/layer1.png)
+![CachyOS board, layer 2](layout/cachyos/png/layer2.png)
+![CachyOS board, layer 3](layout/cachyos/png/layer3.png)
+
 ## What changed
 
 Own pointing driver. `tp_driver.c` is a `POINTING_DEVICE_DRIVER = custom` driver that reproduces the vendor Azoteq report logic (taps, two-finger tap, scroll, movement) but wraps the vendor driver's I2C helpers (`drivers/sensors/azoteq_iqs5xx.c` is still linked, only its helper functions are used). It owns the init retry and polls the chip at most once per 10 ms report period.
@@ -97,7 +115,7 @@ Baked layout refreshed. `keymaps[]` and `encoder_map[]` are the layout read from
 
 Baked layout is the Debian-box board's. `keymaps[]` and `encoder_map[]` are the layout read from that board on 2026-10-17 (`layout/debian/current_layout.json`): home-row mods on S/D/F and J/K/L/;, Delete bottom-left, thumbs TD(1) / MO(2) / MO(3) / Backspace / Enter and MO(3) / Space / `[` / `]` / Hyper+Tab, layer 1 a right-hand numpad with Home/End/PgUp/PgDn, layer 2 F-keys and symbols, layer 3 nav and editing. TD(1) (tap MO(1), double-tap TG(1)) is a Vial tap dance in EEPROM and is not baked, so after an EEPROM reset that thumb key is dead until it is re-created in Vial. The QMK settings in Vial are per board too and are not baked (on this board: permissive hold on, tapping term 200 ms, as of 2026-10-17).
 
-Two boards, two layouts. The two keyboards are used for different things and keep different layouts on purpose. Each board's dump lives in its own directory: `layout/debian/` (the board on the Debian box) and `layout/cachyos/` (the board on the CachyOS box, dump of 2026-10-16, the layout build 9 baked). Re-dump with `.venv/bin/python tools/dump_layout.py --out layout/<board>` and diff the two `current_layout_keymap.c.txt` files to see how they differ. The firmware is the same for both; only the baked fallback follows the Debian board. `layout/backup-20261016/` keeps the 2026-10-11 dump.
+Two boards, two layouts. The two keyboards are used for different things and keep different layouts on purpose. Each board's dump lives in its own directory: `layout/debian/` (the board on the Debian box) and `layout/cachyos/` (the board on the CachyOS box, dump of 2026-10-16, the layout build 9 baked). Re-dump with `.venv/bin/python tools/dump_layout.py --out layout/<board>` (which also redraws `layout/<board>/png/`, see Layouts at the top) and diff the two `current_layout_keymap.c.txt` files to see how they differ. The firmware is the same for both; only the baked fallback follows the Debian board. `layout/backup-20261016/` keeps the 2026-10-11 dump.
 
 Linux horizontal scroll no longer flipped. Build 8 flipped both axes back on a Linux host; on 2026-10-17 the two axes disagreed on the Debian box, so `TP_SCROLL_FLIP_H_LINUX` is now 0 and only vertical is flipped there. macOS and Windows are unchanged.
 
