@@ -3301,9 +3301,9 @@
   },
   "7": {
    "status": 0,
-   "raw_hex": "c8000000",
+   "raw_hex": "e1000000",
    "width_assumed": 2,
-   "value": 200
+   "value": 225
   },
   "9": {
    "status": 0,
@@ -3415,9 +3415,9 @@
   },
   "27": {
    "status": 0,
-   "raw_hex": "00000000",
+   "raw_hex": "96000000",
    "width_assumed": 2,
-   "value": 0
+   "value": 150
   }
  },
  "unmapped_keycodes": {}

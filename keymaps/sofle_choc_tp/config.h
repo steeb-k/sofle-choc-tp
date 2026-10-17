@@ -32,6 +32,17 @@
 #undef DYNAMIC_KEYMAP_LAYER_COUNT
 #define DYNAMIC_KEYMAP_LAYER_COUNT 7
 
+// Build 11: the Vial "QMK settings" as tuned on the board on 2026-10-17 become
+// the defaults. TAPPING_TERM feeds Vial's own reset (qmk_settings_reset); the
+// other three have no config.h equivalent in this tree, so keyboard_post_init_user
+// (keymap.c) writes them whenever the EEPROM has just been reset (no layout
+// marker). Vial's "reset QMK settings" button bypasses that and gives the vendor
+// defaults (tapping term 225 via TAPPING_TERM, everything else off / equal to it).
+#define TAPPING_TERM 225
+#define SCTP_PERMISSIVE_HOLD 1     // Vial qsid 22
+#define SCTP_QUICK_TAP_TERM  200   // Vial qsid 25 (Vial's reset sets it to TAPPING_TERM)
+#define SCTP_FLOW_TAP_TERM   150   // Vial qsid 27 (Vial's reset sets it to 0)
+
 // Idle behaviour (build 5): the OLED stays on as the "powered but idle" indicator
 // and the RGB goes dark after a minute without input, coming back on the next
 // key, encoder or trackpad event if RGB is enabled at all. Both still turn off
@@ -119,6 +130,9 @@
 // Super+Alt chords (Ctrl+Left/Right would steal word movement everywhere); see
 // docs/linux-niri-dms.md for the Niri binds. Windows gets its virtual-desktop
 // shortcuts (untested). The Mission Control key is XF86LaunchA on Linux.
+// Fingers left = Super+Alt+Right = the column to the right, like the Mac's next
+// Space (a build-11 attempt at the mirror was reverted the same day: the
+// direction complaint turned out to be the Ctrl + two-finger swipe below).
 #define TP_SWIPE_LEFT_KEY_LINUX   LGUI(LALT(KC_RGHT))
 #define TP_SWIPE_RIGHT_KEY_LINUX  LGUI(LALT(KC_LEFT))
 #define TP_SWIPE_UP_KEY_LINUX     KC_MISSION_CONTROL
@@ -161,9 +175,12 @@
 // tap completes Ctrl+Tab / Ctrl+Shift+Tab), and the wheel tick is swallowed.
 // macOS keeps the wheel tick for LinearMouse. TP_CTRL_SWIPE_NEXT_TAB_H is the
 // sign of the (single, discrete) horizontal tick that means "next tab"; the
-// other sign is "previous tab" (-1 confirmed on 2026-10-11; +1 felt backwards).
+// other sign is "previous tab". It is the sign *after* the per-OS flip above:
+// -1 was confirmed on 2026-10-11 with TP_SCROLL_FLIP_H_LINUX 1; build 10 set that
+// flip to 0, which silently reversed this too, so build 11 uses +1 to keep the
+// same finger motion meaning "next tab".
 #define TP_CTRL_SWIPE_TABS_LINUX
-#define TP_CTRL_SWIPE_NEXT_TAB_H -1
+#define TP_CTRL_SWIPE_NEXT_TAB_H 1
 
 #define SPLIT_POINTING_ENABLE
 #define POINTING_DEVICE_RIGHT

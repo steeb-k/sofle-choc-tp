@@ -42,8 +42,35 @@ void via_init_kb(void) {
     }
 }
 
+#ifdef QMK_SETTINGS
+#    include "qmk_settings.h"
+// Vial setting ids (qsid), from the protos[] table in quantum/qmk_settings.c.
+#    define SCTP_QSID_PERMISSIVE_HOLD 22
+#    define SCTP_QSID_QUICK_TAP_TERM  25
+#    define SCTP_QSID_FLOW_TAP_TERM   27
+
+// Build 11: after an EEPROM reset Vial's QMK settings are the vendor defaults
+// (qmk_settings_reset: tapping term = TAPPING_TERM, quick tap term = TAPPING_TERM,
+// permissive hold off, flow tap off). Re-apply the values tuned in Vial (see
+// SCTP_* in config.h). Runs after qmk_settings_init, so it updates both the live
+// QS struct and the EEPROM copy.
+static void sctp_apply_settings_defaults(void) {
+    uint8_t  permissive = SCTP_PERMISSIVE_HOLD;
+    uint16_t quick_tap  = SCTP_QUICK_TAP_TERM;
+    uint16_t flow_tap   = SCTP_FLOW_TAP_TERM;
+    qmk_settings_set(SCTP_QSID_PERMISSIVE_HOLD, &permissive, sizeof(permissive));
+    qmk_settings_set(SCTP_QSID_QUICK_TAP_TERM, &quick_tap, sizeof(quick_tap));
+    qmk_settings_set(SCTP_QSID_FLOW_TAP_TERM, &flow_tap, sizeof(flow_tap));
+}
+#endif
+
 void keyboard_post_init_user(void) {
     if (eeconfig_read_user() != SCTP_LAYOUT_MARKER) {
+        // No marker: the EEPROM is blank or was just reset, so everything in it
+        // is the vendor default right now.
+#ifdef QMK_SETTINGS
+        sctp_apply_settings_defaults();
+#endif
         eeconfig_update_user(SCTP_LAYOUT_MARKER);
     }
 }
