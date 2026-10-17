@@ -132,7 +132,8 @@
 // applies natural scrolling, which is what the Mac wanted; the master flips an
 // axis back (1) for the hosts below. On Linux the vertical direction came out
 // backwards (user-reported, 2026-10-11), so vertical is flipped there.
-// Horizontal is flipped there too (confirmed right on 2026-10-11).
+// Horizontal was flipped there too from build 8 to build 9; build 10 leaves it as
+// the pad sends it (user-reported wrong on 2026-10-17: the two axes disagreed).
 // tools/hid_watch.py prints the wheel sign per tick. Windows is a guess.
 // Build 9: macOS (also iOS and a not-yet-detected host) gets its own pair;
 // horizontal is flipped there too (user-requested 2026-10-16), vertical stays
@@ -140,7 +141,7 @@
 #define TP_SCROLL_FLIP_V_MAC    0
 #define TP_SCROLL_FLIP_H_MAC    1
 #define TP_SCROLL_FLIP_V_LINUX  1
-#define TP_SCROLL_FLIP_H_LINUX  1
+#define TP_SCROLL_FLIP_H_LINUX  0
 #define TP_SCROLL_FLIP_V_WIN    0
 #define TP_SCROLL_FLIP_H_WIN    1
 

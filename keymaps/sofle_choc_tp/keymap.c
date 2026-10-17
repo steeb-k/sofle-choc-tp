@@ -143,23 +143,26 @@ report_mouse_t pointing_device_task_user(report_mouse_t mouse_report) {
 }
 #endif // POINTING_DEVICE_ENABLE
 
-// Default keymap, baked from the live Vial layout read on 2026-10-16 with
-// tools/dump_layout.py (layout/current_layout.json). Vial's EEPROM copy still
-// takes precedence day to day; this is what an EEPROM reset comes back to.
+// Default keymap, baked from the live Vial layout of the Debian-box board read on
+// 2026-10-17 with tools/dump_layout.py (layout/debian/current_layout.json; the
+// CachyOS-box board's own layout is under layout/cachyos/). Vial's EEPROM copy
+// still takes precedence day to day; this is what an EEPROM reset comes back to.
+// TD(1) on the base layer is a Vial tap dance (tap MO(1), double-tap TG(1)); it
+// lives in EEPROM only, so after a reset that key is dead until re-created in Vial.
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 [0] = LAYOUT(
-  TD(0), KC_1, KC_2, KC_3, KC_4, KC_5,   KC_6, KC_7, KC_8, KC_9, KC_0, KC_MINS,
-  KC_TAB, KC_Q, KC_W, KC_E, KC_R, KC_T,   KC_Y, KC_U, KC_I, KC_O, KC_P, KC_EQL,
-  KC_LGUI, KC_A, LGUI_T(KC_S), LALT_T(KC_D), LCTL_T(KC_F), KC_G,   KC_H, RCTL_T(KC_J), RALT_T(KC_K), RGUI_T(KC_L), RSFT_T(KC_SCLN), KC_QUOT,
-  KC_LSFT, KC_Z, KC_X, KC_C, KC_V, KC_B, KC_MUTE,   RM_TOGG, KC_N, KC_M, KC_COMM, KC_DOT, KC_SLSH, KC_BSLS,
-  TD(1), KC_LCTL, MO(1), KC_BSPC, KC_ENT,   MO(3), KC_SPC, KC_DEL, MO(2), HYPR(KC_TAB)
+  KC_ESC, KC_1, KC_2, KC_3, KC_4, KC_5,   KC_6, KC_7, KC_8, KC_9, KC_0, KC_MINS,
+  KC_GRV, KC_Q, KC_W, KC_E, KC_R, KC_T,   KC_Y, KC_U, KC_I, KC_O, KC_P, KC_EQL,
+  KC_TAB, LSFT_T(KC_A), LGUI_T(KC_S), LALT_T(KC_D), LCTL_T(KC_F), KC_G,   KC_H, RCTL_T(KC_J), RALT_T(KC_K), RGUI_T(KC_L), RSFT_T(KC_SCLN), KC_QUOT,
+  KC_DEL, KC_Z, KC_X, KC_C, KC_V, KC_B, KC_MUTE,   RM_TOGG, KC_N, KC_M, KC_COMM, KC_DOT, KC_SLSH, KC_BSLS,
+  TD(1), MO(2), MO(3), KC_BSPC, KC_ENT,   MO(3), KC_SPC, KC_LBRC, KC_RBRC, HYPR(KC_TAB)
 ),
 [1] = LAYOUT(
-  KC_GRV, KC_1, KC_2, KC_3, KC_4, KC_5,   KC_PSLS, KC_PAST, KC_PSLS, KC_LBRC, KC_RBRC, KC_EQL,
-  KC_ESC, KC_Q, KC_W, KC_F, KC_P, KC_G,   KC_P7, KC_P8, KC_P9, KC_PAST, KC_SCLN, KC_DEL,
-  KC_TAB, KC_A, KC_R, KC_S, KC_T, KC_D,   KC_P4, KC_P5, KC_P6, KC_PMNS, KC_O, KC_QUOT,
-  KC_LSFT, KC_Z, KC_X, KC_C, KC_V, KC_B, KC_MUTE,   KC_NO, KC_P1, KC_P2, KC_P3, KC_PPLS, KC_SLSH, KC_RSFT,
-  TO(0), KC_LALT, KC_LCTL, KC_BSPC, KC_ENT,   KC_PENT, KC_P0, KC_PDOT, KC_PENT, KC_PENT
+  KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO,   KC_HOME, KC_ESC, KC_PSLS, KC_PAST, KC_PMNS, KC_NO,
+  KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO,   KC_END, KC_P7, KC_P8, KC_P9, KC_PPLS, KC_NO,
+  KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO,   KC_PGUP, KC_P4, KC_P5, KC_P6, KC_PCMM, KC_NO,
+  KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO,   KC_NO, KC_PGDN, KC_P1, KC_P2, KC_P3, KC_PEQL, KC_NO,
+  TG(1), KC_NO, KC_NO, _______, _______,   KC_PENT, KC_P0, KC_PDOT, KC_NO, KC_NO
 ),
 [2] = LAYOUT(
   _______, KC_F1, KC_F2, KC_F3, KC_F4, KC_F5,   KC_F6, KC_F7, KC_F8, KC_F9, KC_F10, KC_F11,
@@ -201,7 +204,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 const uint16_t PROGMEM encoder_map[][NUM_ENCODERS][2] = {
     [0] = { ENCODER_CCW_CW(KC_UP, KC_DOWN), ENCODER_CCW_CW(KC_LEFT, KC_RGHT) },
     [1] = { ENCODER_CCW_CW(KC_VOLD, KC_VOLU), ENCODER_CCW_CW(KC_VOLD, KC_VOLU) },
-    [2] = { ENCODER_CCW_CW(RCTL_T(MS_WHLD), RCTL_T(MS_WHLU)), ENCODER_CCW_CW(_______, _______) },
+    [2] = { ENCODER_CCW_CW(_______, _______), ENCODER_CCW_CW(_______, _______) },
     [3] = { ENCODER_CCW_CW(RM_HUEU, RM_HUED), ENCODER_CCW_CW(RM_VALU, RM_VALD) },
     [4] = { ENCODER_CCW_CW(_______, _______), ENCODER_CCW_CW(_______, _______) },
     [5] = { ENCODER_CCW_CW(_______, _______), ENCODER_CCW_CW(_______, _______) },

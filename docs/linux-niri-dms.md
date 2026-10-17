@@ -19,7 +19,7 @@ sends can be checked at any time with `tools/hid_watch.py` (see the end).
 |---|---|---|
 | 1 / 2 / 3-finger tap | button 1 / 2 / 3 | same |
 | press 1/4 s then move | button 1 held (drag) | same |
-| two-finger scroll | wheel, natural direction on both axes | wheel, both axes flipped back by the master (build 8, see below) |
+| two-finger scroll | wheel, natural direction on both axes | wheel, vertical flipped back by the master (build 8; horizontal was flipped too in builds 8 and 9, not since build 10, see below) |
 | three-finger swipe, fingers left | `Alt+Right` (next Space; `Ctrl+Right` up to build 8) | `Super+Alt+Right` |
 | three-finger swipe, fingers right | `Alt+Left` (previous Space; `Ctrl+Left` up to build 8) | `Super+Alt+Left` |
 | three-finger swipe up | consumer 0x29F "AC Desktop Show All Windows" (QMK `KC_MISSION_CONTROL`) | same key; the kernel maps it to `KEY_SCALE`, xkb calls it **`XF86LaunchA`** |
@@ -43,8 +43,10 @@ on them would steal that everywhere. Super+Alt+arrow is unused by Niri and DMS.
 Scroll direction (build 8): the pad half applies natural scrolling to both
 axes for every host, which is what the Mac wanted. On Linux the vertical
 direction came out backwards, so the master flips vertical back on a Linux host
-(`TP_SCROLL_FLIP_V_LINUX 1` in `config.h`), and horizontal as well
-(`TP_SCROLL_FLIP_H_LINUX 1`); both confirmed on the box. Niri's own `natural-scroll` must stay off for mice either
+(`TP_SCROLL_FLIP_V_LINUX 1` in `config.h`). Horizontal was flipped as well in
+builds 8 and 9 (`TP_SCROLL_FLIP_H_LINUX 1`); on 2026-10-17 the two axes
+disagreed on the Debian box, so build 10 sets it to 0 and horizontal goes
+through as the pad sends it. Niri's own `natural-scroll` must stay off for mice either
 way (below).
 
 Middle click on Linux pastes the primary selection in terminals and many

@@ -47,7 +47,7 @@ Baked layout. `keymaps[]` and `encoder_map[]` are now the layout that was on the
 
     DYLD_FALLBACK_LIBRARY_PATH=/opt/homebrew/lib .venv/bin/python tools/dump_layout.py
 
-then paste `layout/current_layout_keymap.c.txt` over the two arrays in `keymap.c`. The dump also covers macros, tap dances, combos, key overrides and QMK settings (`layout/current_layout.json`); all were empty on 2026-10-11, so nothing else is baked in.
+then paste `current_layout_keymap.c.txt` over the two arrays in `keymap.c`. The dump also covers macros, tap dances, combos, key overrides and QMK settings (`current_layout.json`); all were empty on 2026-10-11, so nothing else is baked in. Since build 10 the dumps live per board (see Build 10): pass `--out layout/<board>`.
 
 ## Build 5
 
@@ -92,6 +92,14 @@ Three-finger swipe left/right on macOS now send Alt+Right / Alt+Left (`TP_SWIPE_
 Horizontal scroll flipped on macOS. The build 8 per-OS flip now has a macOS pair too (`TP_SCROLL_FLIP_V_MAC 0`, `TP_SCROLL_FLIP_H_MAC 1`), used for macOS, iOS and a not-yet-detected host: vertical stays natural as the pad sends it, horizontal is reversed. This flip happens before LinearMouse sees the wheel, so on the Mac check `scrolling.reverse.horizontal` in `~/.config/linearmouse/linearmouse.json` (set to true in build 6; with the firmware flip it would reverse horizontal back again) and the Cmd + wheel left/right back/forward mappings, whose sides swap with the tick sign.
 
 Baked layout refreshed. `keymaps[]` and `encoder_map[]` are the layout read from the board on 2026-10-16 (`layout/current_layout.json`; the 2026-10-11 dump is kept in `layout/backup-20261016/`). The two tap dances and two macros in that layout live in Vial's EEPROM only and are not baked.
+
+## Build 10
+
+Baked layout is the Debian-box board's. `keymaps[]` and `encoder_map[]` are the layout read from that board on 2026-10-17 (`layout/debian/current_layout.json`): home-row mods on S/D/F and J/K/L/;, Delete bottom-left, thumbs TD(1) / MO(2) / MO(3) / Backspace / Enter and MO(3) / Space / `[` / `]` / Hyper+Tab, layer 1 a right-hand numpad with Home/End/PgUp/PgDn, layer 2 F-keys and symbols, layer 3 nav and editing. TD(1) (tap MO(1), double-tap TG(1)) is a Vial tap dance in EEPROM and is not baked, so after an EEPROM reset that thumb key is dead until it is re-created in Vial. The QMK settings in Vial are per board too and are not baked (on this board: permissive hold on, tapping term 200 ms, as of 2026-10-17).
+
+Two boards, two layouts. The two keyboards are used for different things and keep different layouts on purpose. Each board's dump lives in its own directory: `layout/debian/` (the board on the Debian box) and `layout/cachyos/` (the board on the CachyOS box, dump of 2026-10-16, the layout build 9 baked). Re-dump with `.venv/bin/python tools/dump_layout.py --out layout/<board>` and diff the two `current_layout_keymap.c.txt` files to see how they differ. The firmware is the same for both; only the baked fallback follows the Debian board. `layout/backup-20261016/` keeps the 2026-10-11 dump.
+
+Linux horizontal scroll no longer flipped. Build 8 flipped both axes back on a Linux host; on 2026-10-17 the two axes disagreed on the Debian box, so `TP_SCROLL_FLIP_H_LINUX` is now 0 and only vertical is flipped there. macOS and Windows are unchanged.
 
 ## Build 8
 
