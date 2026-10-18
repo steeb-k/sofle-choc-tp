@@ -13,6 +13,47 @@ The layout is read from the live board with `tools/dump_layout.py` and drawn by 
 ![Layer 2](layout/png/layer2.png)
 ![Layer 3](layout/png/layer3.png)
 
+## Trackpad gestures
+
+The pad is an Azoteq IQS572 (43 x 40 mm) on the right half. The chip's own tap, two-finger tap and press-and-hold gestures are switched off; `tp_gesture()` in `tp_driver.c` decides taps, drags and swipes from the per-frame finger count and motion, and `pointing_device_task_user` in `keymap.c` on the USB half turns them into clicks, key chords and wheel ticks for the detected host OS (the white box on the left OLED shows which one; until detection settles, about a quarter second after plug-in, the macOS set is used). The tunables are the `TP_*` defines in `config.h`. The pictures are drawn by `tools/render_gestures.py`; `tools/hid_watch.py` shows what the board actually sends.
+
+### Taps and drags (every host)
+
+| | Gesture | What happens |
+|---|---|---|
+| ![tap1](layout/png/gestures/tap1.png) | One-finger tap | Left click. A tap is a touch shorter than 200 ms that drifts less than about 1.6 mm; it never nudges the cursor. |
+| ![tap2](layout/png/gestures/tap2.png) | Two-finger tap | Right click. |
+| ![tap3](layout/png/gestures/tap3.png) | Three-finger tap | Middle click. |
+| ![drag](layout/png/gestures/drag.png) | Press, hold still for 180 ms, then move | Left-button drag until the finger lifts. The button goes down where the finger rested and the cursor catches up with the finger. A finger that rests and lifts does nothing, and slow careful pointing never starts a drag. |
+| ![drag gui](layout/png/gestures/drag_gui.png) | Cmd/Super held, then press, hold, move | Right-button drag (context menu on release in most apps, orbit in Blender). The modifier is hidden from the host for the whole drag, so on Linux Niri does not move the window. Cmd/Super + tap is still a modified left click. |
+| ![drag ctrl](layout/png/gestures/drag_ctrl.png) | Ctrl held, then press, hold, move | Middle-button drag (orbit or pan in CAD, autoscroll in a browser). Ctrl is hidden likewise and comes back once the button is up; Shift or Alt held alongside reach the host. Cmd/Super wins when both are held. |
+
+### Two-finger scrolling and modified swipes
+
+Two fingers scroll with natural direction on both axes, one wheel line per 8 units (about 0.33 mm), sent in 40 ms batches. Holding Cmd/Super, Ctrl or Alt while two fingers move sideways makes the swipe discrete: exactly one wheel tick per swipe however far the fingers travel, so the host-side mappings below fire once.
+
+| | Gesture | macOS | Linux (Niri + DMS) | Windows (untested) |
+|---|---|---|---|---|
+| ![scroll v](layout/png/gestures/scroll_v.png) | Two fingers up / down | Scroll | Scroll | Scroll |
+| ![scroll h](layout/png/gestures/scroll_h.png) | Two fingers sideways | Horizontal scroll; LinearMouse turns it into swipe-to-navigate in Safari and Chrome | Horizontal scroll | Horizontal scroll |
+| ![scroll gui v](layout/png/gestures/scroll_gui_v.png) | Cmd/Super + two fingers up / down | Pinch zoom (LinearMouse) | Wheel with Super held | Wheel with Win held |
+| ![swipe gui](layout/png/gestures/swipe_gui.png) | Cmd/Super + two fingers sideways | Back / Forward, one page per swipe (LinearMouse) | Previous / next column (DMS Mod+WheelScroll binds) | One wheel tick with Win held |
+| ![swipe ctrl](layout/png/gestures/swipe_ctrl.png) | Ctrl + two fingers sideways | Previous / next tab (LinearMouse) | Previous / next tab: the firmware taps Shift+Tab / Tab under the held Ctrl and swallows the wheel tick | One wheel tick with Ctrl held (a zoom step in most apps) |
+| ![swipe alt](layout/png/gestures/swipe_alt.png) | Alt + two fingers sideways | Firefox: fingers left = Forward, fingers right = Back | Same | Same |
+
+### Three-finger swipes
+
+Three fingers never scroll. About 4 mm of sideways travel, or 8 mm up or down, within 0.7 s of the first touch fires one swipe per touch; a slow three-finger touch that moves less does nothing, and a touch that swiped does not also middle-click. The chords are the `TP_SWIPE_*_KEY` defines in `config.h`; the Linux binds live in `host/niri-sofle.kdl`, and the macOS Space shortcuts must be set to Option+arrow in System Settings > Keyboard > Keyboard Shortcuts > Mission Control.
+
+| | Fingers move | macOS | Linux (Niri) | Windows (untested) |
+|---|---|---|---|---|
+| ![swipe3 left](layout/png/gestures/swipe3_left.png) | Left | Alt+Right: the Space to the right | Super+Alt+Right: next column | Ctrl+Win+Right: next virtual desktop |
+| ![swipe3 right](layout/png/gestures/swipe3_right.png) | Right | Alt+Left: the Space to the left | Super+Alt+Left: previous column | Ctrl+Win+Left: previous virtual desktop |
+| ![swipe3 up](layout/png/gestures/swipe3_up.png) | Up | Mission Control | XF86LaunchA (the same key): Overview | Win+Tab: Task View |
+| ![swipe3 down](layout/png/gestures/swipe3_down.png) | Down | Ctrl+Down: App Exposé | Super+Alt+Down: Overview | Win+Tab: Task View |
+
+Not a pad gesture but in the same family: Ctrl + the right encoder is Ctrl+Tab / Ctrl+Shift+Tab (previous / next tab) on every host.
+
 ## What changed
 
 Own pointing driver. `tp_driver.c` is a `POINTING_DEVICE_DRIVER = custom` driver that reproduces the vendor Azoteq report logic (taps, two-finger tap, scroll, movement) but wraps the vendor driver's I2C helpers (`drivers/sensors/azoteq_iqs5xx.c` is still linked, only its helper functions are used). It owns the init retry and polls the chip at most once per 10 ms report period.
@@ -101,6 +142,10 @@ Three-finger swipe left/right on macOS now send Alt+Right / Alt+Left (`TP_SWIPE_
 Horizontal scroll flipped on macOS. The build 8 per-OS flip now has a macOS pair too (`TP_SCROLL_FLIP_V_MAC 0`, `TP_SCROLL_FLIP_H_MAC 1`), used for macOS, iOS and a not-yet-detected host: vertical stays natural as the pad sends it, horizontal is reversed. This flip happens before LinearMouse sees the wheel, so on the Mac check `scrolling.reverse.horizontal` in `~/.config/linearmouse/linearmouse.json` (set to true in build 6; with the firmware flip it would reverse horizontal back again) and the Cmd + wheel left/right back/forward mappings, whose sides swap with the tick sign.
 
 Baked layout refreshed. `keymaps[]` and `encoder_map[]` are the layout read from the board on 2026-10-16 (`layout/current_layout.json`; the 2026-10-11 dump is kept in `layout/backup-20261016/`). The two tap dances and two macros in that layout live in Vial's EEPROM only and are not baked.
+
+## Build 17
+
+Baked layout refreshed. `keymaps[]` and `encoder_map[]` are the layout read from the board on 2026-10-18 (`layout/current_layout.json`; the 2026-10-17 dump that build 11 baked is kept in `layout/backup-20261018/`). On the base layer, backtick and Esc have swapped places (backtick top-left, Esc at the start of the Q row), the home-row mods are now GUI/Alt/Shift/Ctrl on A/S/D/F and Ctrl/Shift/Alt/GUI on J/K/L/;, the bottom-left key is Ctrl instead of Delete, and Delete replaces MO(3) on the third left thumb (the right-hand MO(3) is now the only one). Layer 3 gains Play/Pause on the `,` key. The Vial QMK settings changed too, so the defaults follow: tapping term 200 ms (`TAPPING_TERM`, was 225) and flow tap term 50 ms (`SCTP_FLOW_TAP_TERM`, was 150); permissive hold and the 200 ms quick tap term are unchanged. A second tap dance, TD(0) (tap backtick, hold Esc, 200 ms), exists in Vial's EEPROM but is not placed on any layer; like TD(1) it is not baked. The layer pictures (`tools/render_layout.py`, `layout/png/`) are now white legends on dark keycaps with a transparent canvas, made for a dark page such as GitHub's; the title is white text with a thin outline so it does not get lost. New `tools/render_gestures.py` draws the trackpad gesture pictograms (`layout/png/gestures/`) for the Trackpad gestures section at the top of this file. No trackpad changes.
 
 ## Build 16
 

@@ -27,14 +27,16 @@ PAD = 24          # canvas margin
 GAP = 5           # gap between keycaps
 SCALE = 2         # supersampling factor
 
-BG = (250, 250, 250)
-KEY = (255, 255, 255)
-KEY_MOD = (232, 236, 244)   # keys whose tap is a modifier or layer key
-KEY_TRNS = (243, 243, 243)
-EDGE = (120, 120, 120)
-TEXT = (20, 20, 20)
-SUB = (90, 90, 90)
-TRNS = (170, 170, 170)
+# Light on dark: the canvas is transparent and only the keycaps are painted; the
+# title is white text in a thin outline (for a dark page, GitHub's included).
+BG = (0, 0, 0, 0)
+KEY = (28, 28, 30)
+KEY_MOD = (48, 52, 64)      # keys whose tap is a modifier or layer key
+KEY_TRNS = (18, 18, 20)
+EDGE = (150, 150, 155)
+TEXT = (245, 245, 245)
+SUB = (190, 190, 195)
+TRNS = (105, 105, 110)
 
 LAYER_NAMES = {0: 'base', 1: 'numpad', 2: 'symbols / F-keys', 3: 'nav / edit'}
 
@@ -219,9 +221,13 @@ def render_layer(keys, layer, names, enc_names, tds, title, bounds):
     minx, miny, maxx, maxy = bounds
     W = int((maxx - minx) * U + 2 * PAD) * s
     H = int((maxy - miny) * U + 2 * PAD + 34) * s
-    img = Image.new('RGBA', (W, H), BG + (255,))
+    img = Image.new('RGBA', (W, H), BG)
     d = ImageDraw.Draw(img)
-    d.text((PAD * s, 10 * s), title, font=font(16 * s, bold=True), fill=TEXT)
+    # the title gets a thin outline so it does not get lost against the page
+    tf = font(16 * s, bold=True)
+    tw = d.textlength(title, font=tf)
+    d.rounded_rectangle([PAD * s, 6 * s, PAD * s + tw + 16 * s, 30 * s], radius=6 * s, fill=None, outline=EDGE, width=s)
+    d.text((PAD * s + 8 * s, 18 * s), title, font=tf, fill=TEXT, anchor='lm')
     oy = 34 * s
 
     def P(px, py):
@@ -254,7 +260,7 @@ def render_layer(keys, layer, names, enc_names, tds, title, bounds):
             d.polygon(poly, fill=fill, outline=EDGE)
             d.line(poly + [poly[0]], fill=EDGE, width=s)
         draw_text_block(img, cx, cy, k['r'], main, sub, kk['w'] * U * s, kk['h'] * U * s, s)
-    return img.resize((W // s, H // s), Image.LANCZOS).convert('RGB')
+    return img.resize((W // s, H // s), Image.LANCZOS)
 
 
 def layer_is_empty(names, enc, layer):

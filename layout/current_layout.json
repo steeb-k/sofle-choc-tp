@@ -22,7 +22,7 @@
  "keymap": [
   [
    [
-    41,
+    53,
     30,
     31,
     32,
@@ -30,7 +30,7 @@
     34
    ],
    [
-    53,
+    41,
     20,
     26,
     8,
@@ -39,14 +39,14 @@
    ],
    [
     43,
-    8708,
-    10262,
-    9223,
+    10244,
+    9238,
+    8711,
     8457,
     10
    ],
    [
-    76,
+    224,
     29,
     27,
     6,
@@ -56,7 +56,7 @@
    [
     22273,
     21026,
-    21027,
+    76,
     42,
     40,
     168
@@ -79,9 +79,9 @@
    ],
    [
     52,
-    12851,
-    14351,
-    13326,
+    14387,
+    13327,
+    12814,
     12557,
     11
    ],
@@ -335,7 +335,7 @@
     1,
     0,
     1,
-    0,
+    174,
     1,
     0
    ],
@@ -598,7 +598,7 @@
  "keymap_names": [
   [
    [
-    "KC_ESC",
+    "KC_GRV",
     "KC_1",
     "KC_2",
     "KC_3",
@@ -606,7 +606,7 @@
     "KC_5"
    ],
    [
-    "KC_GRV",
+    "KC_ESC",
     "KC_Q",
     "KC_W",
     "KC_E",
@@ -615,14 +615,14 @@
    ],
    [
     "KC_TAB",
-    "LSFT_T(KC_A)",
-    "LGUI_T(KC_S)",
-    "LALT_T(KC_D)",
+    "LGUI_T(KC_A)",
+    "LALT_T(KC_S)",
+    "LSFT_T(KC_D)",
     "LCTL_T(KC_F)",
     "KC_G"
    ],
    [
-    "KC_DEL",
+    "KC_LCTL",
     "KC_Z",
     "KC_X",
     "KC_C",
@@ -632,7 +632,7 @@
    [
     "TD(1)",
     "MO(2)",
-    "MO(3)",
+    "KC_DEL",
     "KC_BSPC",
     "KC_ENT",
     "KC_MUTE"
@@ -655,9 +655,9 @@
    ],
    [
     "KC_QUOT",
-    "RSFT_T(KC_SCLN)",
-    "RGUI_T(KC_L)",
-    "RALT_T(KC_K)",
+    "RGUI_T(KC_SCLN)",
+    "RALT_T(KC_L)",
+    "RSFT_T(KC_K)",
     "RCTL_T(KC_J)",
     "KC_H"
    ],
@@ -911,7 +911,7 @@
     "_______",
     "KC_NO",
     "_______",
-    "KC_NO",
+    "KC_MPLY",
     "_______",
     "KC_NO"
    ],
@@ -1401,14 +1401,14 @@
  "tap_dance": [
   {
    "status": 0,
-   "on_tap": 0,
-   "on_hold": 0,
+   "on_tap": 53,
+   "on_hold": 41,
    "on_double_tap": 0,
    "on_tap_hold": 0,
    "tapping_term": 200,
    "names": {
-    "on_tap": "KC_NO",
-    "on_hold": "KC_NO",
+    "on_tap": "KC_GRV",
+    "on_hold": "KC_ESC",
     "on_double_tap": "KC_NO",
     "on_tap_hold": "KC_NO"
    }
@@ -3301,9 +3301,9 @@
   },
   "7": {
    "status": 0,
-   "raw_hex": "e1000000",
+   "raw_hex": "c8000000",
    "width_assumed": 2,
-   "value": 225
+   "value": 200
   },
   "9": {
    "status": 0,
@@ -3415,9 +3415,9 @@
   },
   "27": {
    "status": 0,
-   "raw_hex": "96000000",
+   "raw_hex": "32000000",
    "width_assumed": 2,
-   "value": 150
+   "value": 50
   }
  },
  "unmapped_keycodes": {}

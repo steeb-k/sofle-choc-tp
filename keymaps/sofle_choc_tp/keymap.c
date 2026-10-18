@@ -280,18 +280,19 @@ report_mouse_t pointing_device_task_user(report_mouse_t mouse_report) {
 }
 #endif // POINTING_DEVICE_ENABLE
 
-// Default keymap, baked from the live Vial layout read on 2026-10-17 with
+// Default keymap, baked from the live Vial layout read on 2026-10-18 with
 // tools/dump_layout.py (layout/current_layout.json). Vial's EEPROM copy still
 // takes precedence day to day; this is what an EEPROM reset comes back to.
 // TD(1) on the base layer is a Vial tap dance (tap MO(1), double-tap TG(1)); it
 // lives in EEPROM only, so after a reset that key is dead until re-created in Vial.
+// TD(0) (tap `, hold Esc) is also defined in Vial but not placed on any layer.
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 [0] = LAYOUT(
-  KC_ESC, KC_1, KC_2, KC_3, KC_4, KC_5,   KC_6, KC_7, KC_8, KC_9, KC_0, KC_MINS,
-  KC_GRV, KC_Q, KC_W, KC_E, KC_R, KC_T,   KC_Y, KC_U, KC_I, KC_O, KC_P, KC_EQL,
-  KC_TAB, LSFT_T(KC_A), LGUI_T(KC_S), LALT_T(KC_D), LCTL_T(KC_F), KC_G,   KC_H, RCTL_T(KC_J), RALT_T(KC_K), RGUI_T(KC_L), RSFT_T(KC_SCLN), KC_QUOT,
-  KC_DEL, KC_Z, KC_X, KC_C, KC_V, KC_B, KC_MUTE,   RM_TOGG, KC_N, KC_M, KC_COMM, KC_DOT, KC_SLSH, KC_BSLS,
-  TD(1), MO(2), MO(3), KC_BSPC, KC_ENT,   MO(3), KC_SPC, KC_LBRC, KC_RBRC, HYPR(KC_TAB)
+  KC_GRV, KC_1, KC_2, KC_3, KC_4, KC_5,   KC_6, KC_7, KC_8, KC_9, KC_0, KC_MINS,
+  KC_ESC, KC_Q, KC_W, KC_E, KC_R, KC_T,   KC_Y, KC_U, KC_I, KC_O, KC_P, KC_EQL,
+  KC_TAB, LGUI_T(KC_A), LALT_T(KC_S), LSFT_T(KC_D), LCTL_T(KC_F), KC_G,   KC_H, RCTL_T(KC_J), RSFT_T(KC_K), RALT_T(KC_L), RGUI_T(KC_SCLN), KC_QUOT,
+  KC_LCTL, KC_Z, KC_X, KC_C, KC_V, KC_B, KC_MUTE,   RM_TOGG, KC_N, KC_M, KC_COMM, KC_DOT, KC_SLSH, KC_BSLS,
+  TD(1), MO(2), KC_DEL, KC_BSPC, KC_ENT,   MO(3), KC_SPC, KC_LBRC, KC_RBRC, HYPR(KC_TAB)
 ),
 [1] = LAYOUT(
   KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO,   KC_HOME, KC_ESC, KC_PSLS, KC_PAST, KC_PMNS, KC_NO,
@@ -311,7 +312,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
   _______, _______, _______, _______, _______, _______,   _______, _______, _______, _______, _______, _______,
   _______, KC_INS, KC_PSCR, KC_APP, KC_NO, KC_NO,   KC_PGUP, _______, KC_UP, _______, _______, KC_BSPC,
   _______, KC_LALT, KC_LCTL, KC_LSFT, KC_NO, KC_CAPS,   KC_PGDN, KC_LEFT, KC_DOWN, KC_RGHT, KC_DEL, KC_BSPC,
-  _______, KC_UNDO, KC_CUT, KC_COPY, KC_PSTE, KC_NO, RM_NEXT,   RM_PREV, KC_NO, _______, KC_NO, _______, KC_NO, _______,
+  _______, KC_UNDO, KC_CUT, KC_COPY, KC_PSTE, KC_NO, RM_NEXT,   RM_PREV, KC_NO, _______, KC_MPLY, _______, KC_NO, _______,
   _______, _______, _______, _______, _______,   _______, _______, _______, _______, _______
 ),
 [4] = LAYOUT(
