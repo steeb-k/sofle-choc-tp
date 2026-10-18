@@ -157,7 +157,7 @@ static void tp_retry_init(void) {
 #    define TP_CLICK_FRAMES 2
 #endif
 #ifndef TP_HOLD_MS
-#    define TP_HOLD_MS 250
+#    define TP_HOLD_MS 180
 #endif
 #ifndef TP_HOLD_STILL_DRIFT
 #    define TP_HOLD_STILL_DRIFT 12
@@ -556,7 +556,10 @@ static void tp_gesture(const tp_meas_data_t *md, report_mouse_t *report) {
     if (sess_active && n == 0 && (sess_mode != TP_DRAGGING || zero_frames >= 2)) {
         if (sess_mode == TP_DRAGGING) {
             TP_EV("drag_end");
-        } else if (sess_maxf == 1 && (sess_mode == TP_PENDING || sess_mode == TP_MOVING) && elapsed <= TP_TAP_MAX_MS && sess_drift1 <= TP_TAP_MAX_DRIFT) {
+        } else if (sess_maxf == 1 && (sess_mode == TP_PENDING || sess_mode == TP_MOVING || sess_mode == TP_ARMED) && elapsed <= TP_TAP_MAX_MS && sess_drift1 <= TP_TAP_MAX_DRIFT) {
+            // TP_ARMED counts too (build 15): TP_HOLD_MS is shorter than the tap
+            // window, so a slow tap arms before it lifts and must still click.
+            // A finger that rests past TP_TAP_MAX_MS and lifts still does not.
             tp_click(POINTING_DEVICE_BUTTON1);
             TP_EV("click1");
         } else if (sess_maxf == 2 && sess_lines == 0 && elapsed <= TP_MULTI_TAP_MAX_MS && sess_motion <= TP_MULTI_TAP_MAX_MOTION) {

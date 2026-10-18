@@ -102,8 +102,8 @@
 #define TP_MULTI_TAP_MAX_MS  300   // 2- and 3-finger taps (fingers land staggered)
 #define TP_MULTI_TAP_MAX_MOTION 60 // sum of |rel x|+|rel y| allowed during a multi-finger tap
 #define TP_CLICK_FRAMES      2     // frames (10 ms each) a synthetic click is held
-#define TP_HOLD_MS           250   // press-and-hold before drag arms
-#define TP_HOLD_STILL_DRIFT  12    // units (~0.5 mm) a finger may move and still count as held still (resting: 5 in 250 ms)
+#define TP_HOLD_MS           180   // press-and-hold before drag arms (250 up to build 14; below TP_TAP_MAX_MS, so an armed finger that lifts within the tap window still clicks)
+#define TP_HOLD_STILL_DRIFT  12    // units (~0.5 mm) a finger may move and still count as held still (resting: 5 in 250 ms, so well under in 180)
 #define TP_DEAD_ZONE_UNITS   12    // no cursor motion until the touch has drifted this far
 #define TP_DRAG_START_UNITS  16    // ~0.7 mm of travel within a 200 ms window after arming starts the drag; resting creep stays below this
 // #define TP_DRAG2_BUTTON      POINTING_DEVICE_BUTTON2 // build 13's two-finger hold-then-move drag, off since build 14: two resting fingers trip the chip's scroll gesture before the hold arms, so it only ever scrolled. The modifier drags below replace it.
