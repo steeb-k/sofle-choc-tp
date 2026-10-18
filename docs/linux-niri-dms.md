@@ -19,6 +19,8 @@ sends can be checked at any time with `tools/hid_watch.py` (see the end).
 |---|---|---|
 | 1 / 2 / 3-finger tap | button 1 / 2 / 3 | same |
 | press 1/4 s then move | button 1 held (drag) | same |
+| two fingers rested 1/4 s then moved (build 13) | button 2 held (right drag) | same |
+| Ctrl held, then the same two-finger drag (build 13) | button 3 held (middle drag), Ctrl hidden from the host for the drag | same; `hid_watch.py` shows button 3 and no `LCtl` |
 | two-finger scroll | wheel, natural direction on both axes | wheel, vertical flipped back by the master (build 8; horizontal was flipped too in builds 8 and 9, not since build 10, see below) |
 | three-finger swipe, fingers left | `Alt+Right` (next Space; `Ctrl+Right` up to build 8) | `Super+Alt+Right` |
 | three-finger swipe, fingers right | `Alt+Left` (previous Space; `Ctrl+Left` up to build 8) | `Super+Alt+Left` |
@@ -51,7 +53,10 @@ way (below).
 
 Middle click on Linux pastes the primary selection in terminals and many
 editors, so a three-finger tap over a text field pastes. That is standard Linux
-behaviour, not a firmware quirk.
+behaviour, not a firmware quirk. The same goes for the Ctrl + two-finger drag
+of build 13: it is a middle-button drag, so over a text field the release
+pastes the primary selection, while in a browser it autoscrolls and in CAD
+views it orbits or pans.
 
 ## The Niri binds (`~/.config/niri/sofle.kdl`)
 
