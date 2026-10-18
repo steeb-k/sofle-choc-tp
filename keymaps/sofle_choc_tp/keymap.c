@@ -255,6 +255,20 @@ report_mouse_t pointing_device_task_user(report_mouse_t mouse_report) {
                     mouse_report.h = 0;
                 }
 #endif
+#if defined(OS_DETECTION_ENABLE) && (TP_ALT_H_FLIP_MAC || TP_ALT_H_FLIP_LINUX || TP_ALT_H_FLIP_WIN)
+                // Alt alone + sideways swipe (build 16): Firefox turns the tick into
+                // Back/Forward with a fixed sign; flip it per OS so fingers left is
+                // Forward everywhere (config.h, TP_ALT_H_FLIP_*).
+                if (mouse_report.h != 0 && (get_mods() & MOD_MASK_ALT) && !(get_mods() & (MOD_MASK_GUI | MOD_MASK_CTRL))) {
+                    bool flip_alt;
+                    switch (detected_host_os()) {
+                        case OS_LINUX:   flip_alt = TP_ALT_H_FLIP_LINUX; break;
+                        case OS_WINDOWS: flip_alt = TP_ALT_H_FLIP_WIN;   break;
+                        default:         flip_alt = TP_ALT_H_FLIP_MAC;   break;
+                    }
+                    if (flip_alt) mouse_report.h = (int8_t)-mouse_report.h;
+                }
+#endif
             }
             last_h_time = timer_read();  // every fresh horizontal tick extends the lockout
         }

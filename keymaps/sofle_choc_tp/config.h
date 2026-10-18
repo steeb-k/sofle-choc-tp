@@ -186,6 +186,19 @@
 #define TP_CTRL_SWIPE_TABS_LINUX
 #define TP_CTRL_SWIPE_NEXT_TAB_H 1
 
+// Build 16: Alt + sideways swipe is browser history in Firefox on every OS
+// (mousewheel.with_alt.action 2, no per-OS override): a positive wheel tick is
+// Back, a negative one Forward. Fingers left should be Forward, like the next
+// column (Super) and the next tab (Ctrl). The sign that reaches the browser is a
+// by-product of the per-OS TP_SCROLL_FLIP_H_* above (plus LinearMouse's
+// scrolling.reverse.horizontal on the Mac), so the correction is per OS too:
+// with these set, fingers left reached Firefox as +1 (Back) on Linux and macOS
+// and as -1 (Forward, already right) on Windows. 1 negates the single Alt tick;
+// Alt alone, since Cmd/Super and Ctrl keep their own meanings. Windows untested.
+#define TP_ALT_H_FLIP_MAC    1
+#define TP_ALT_H_FLIP_LINUX  1
+#define TP_ALT_H_FLIP_WIN    0
+
 #define SPLIT_POINTING_ENABLE
 #define POINTING_DEVICE_RIGHT
 

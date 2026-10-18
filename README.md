@@ -102,6 +102,10 @@ Horizontal scroll flipped on macOS. The build 8 per-OS flip now has a macOS pair
 
 Baked layout refreshed. `keymaps[]` and `encoder_map[]` are the layout read from the board on 2026-10-16 (`layout/current_layout.json`; the 2026-10-11 dump is kept in `layout/backup-20261016/`). The two tap dances and two macros in that layout live in Vial's EEPROM only and are not baked.
 
+## Build 16
+
+Alt + sideways swipe reversed on macOS and Linux. Alt (Option) + horizontal wheel is browser history in Firefox on every OS (`mousewheel.with_alt.action` 2, applied to both axes, no per-OS override; a positive tick is Back, a negative one Forward). Fingers left went Back while Super gives the next column and Ctrl the next tab. The sign Firefox saw was a by-product of the per-OS horizontal scroll flip (`TP_SCROLL_FLIP_H_*`, plus LinearMouse's `scrolling.reverse.horizontal` on the Mac): positive on Linux and macOS, negative on Windows. `pointing_device_task_user` now negates the single Alt tick per OS (`TP_ALT_H_FLIP_MAC` 1, `TP_ALT_H_FLIP_LINUX` 1, `TP_ALT_H_FLIP_WIN` 0, next to the Ctrl swipe defines in `config.h`), only when Alt is held without Cmd/Super or Ctrl, so fingers left is Forward everywhere. The macOS value assumes the LinearMouse config in `host/linearmouse.json`; if the Mac still goes the wrong way, set `TP_ALT_H_FLIP_MAC` to 0. Chromium has no Alt + wheel history, so there the flip only changes which way the single scroll tick nudges.
+
 ## Build 15
 
 Shorter hold before a drag. `TP_HOLD_MS` goes from 250 to 180 ms: the press before a drag felt longer than it needed to be, and a finger that started moving before the 250 ms were up fell through to plain pointing and had to be pressed again. 180 ms is under the tap window (`TP_TAP_MAX_MS`, 200 ms; measured taps last 90-155 ms), so a slow tap now arms before it lifts; the lift logic in `tp_driver.c` therefore also clicks from the armed state when the touch lifts within the tap window and within tap drift, which is exactly what it did for that touch before. A finger that rests past 200 ms and lifts still does nothing. The stillness limit (`TP_HOLD_STILL_DRIFT`, 12 units; a resting finger measured 5 in 250 ms) and the drag start threshold are unchanged. The disabled two-finger drag shares the define.
@@ -248,5 +252,6 @@ Note that the vendor keymap does not preserve EEPROM across builds, so flashing 
 - The OLED's white box shows the detected host OS; on Linux the three-finger swipes send Super+Alt chords (bound in Niri per docs/linux-niri-dms.md) and `python3 tools/hid_watch.py` shows them as `LGui+LAlt+Right` etc.
 - On Linux, two-finger scroll goes the same way as on the Mac on both axes (build 8 flips horizontal back; `hid_watch.py` prints the wheel sign per tick).
 - Ctrl + right encoder switches tabs; Cmd + sideways swipe goes back/forward once per swipe; Ctrl + sideways swipe switches one tab (LinearMouse mappings on the Mac, firmware taps on Linux).
+- Alt + sideways swipe in Firefox: fingers left = Forward, fingers right = Back, one step per swipe, on every host (build 16).
 - On Linux, Ctrl + sideways swipe switches one tab per swipe with no horizontal scroll leaking through; `hid_watch.py` shows `LCtl+Tab` / `LCtl+LSft+Tab` and no wheel tick.
 - If Vial shows a wrong or scrambled layout after flashing, the stored data did not match this build's layout; use File > Load saved layout with the .vil. If the board misbehaves badly, hold the top-left key of the left half while plugging it in (bootmagic) to clear EEPROM, then load the .vil.

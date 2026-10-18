@@ -27,7 +27,8 @@ sends can be checked at any time with `tools/hid_watch.py` (see the end).
 | three-finger swipe up | consumer 0x29F "AC Desktop Show All Windows" (QMK `KC_MISSION_CONTROL`) | same key; the kernel maps it to `KEY_SCALE`, xkb calls it **`XF86LaunchA`** |
 | three-finger swipe down | `Ctrl+Down` (App Expose) | `Super+Alt+Down` |
 | Ctrl + right encoder | `Ctrl+Tab` / `Ctrl+Shift+Tab` | same |
-| Super or Alt held + sideways swipe | exactly one wheel left/right tick | same |
+| Super held + sideways swipe | exactly one wheel left/right tick | same (DMS: previous / next column) |
+| Alt held + sideways swipe | one wheel tick, negated since build 16 so that in Firefox fingers left = Forward, fingers right = Back | same |
 | Ctrl held + sideways swipe | one wheel tick (LinearMouse: previous / next tab) | `Tab` / `Shift+Tab` tapped by the firmware while Ctrl is held = previous / next tab; no tick |
 | Super + vertical scroll | plain wheel with Super held (LinearMouse: pinch zoom) | plain wheel with Super held |
 
