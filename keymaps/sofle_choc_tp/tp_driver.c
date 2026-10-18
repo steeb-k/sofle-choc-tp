@@ -188,8 +188,9 @@ static void tp_retry_init(void) {
 #endif
 
 // TP_PENDING2/TP_ARMED2 are the two-finger counterparts of TP_PENDING/TP_ARMED
-// (build 13); both drags share TP_DRAGGING and differ by sess_drag_btn (BUTTON1,
-// or BUTTON8 for the two-finger drag, which the master translates).
+// (build 13, off since build 14); both drags share TP_DRAGGING. A drag is
+// reported as a BUTTON8 level: this half knows nothing about modifiers, so the
+// master turns it into the left, right or middle button (keymap.c, build 14).
 typedef enum { TP_IDLE, TP_PENDING, TP_MOVING, TP_ARMED, TP_DRAGGING, TP_PENDING2, TP_ARMED2 } tp_mode_t;
 
 static bool      sess_active;
@@ -202,9 +203,11 @@ static int16_t   sess_hold_dx, sess_hold_dy;     // rel motion held back while a
 static int16_t   sess_replay_x, sess_replay_y;   // held-back motion still to be sent after drag start
 static uint8_t   sess_drag_btn;                  // button held while TP_DRAGGING (bit index)
 static bool      sess_drag2;                     // the current TP_DRAGGING is the two-finger kind
+#ifdef TP_DRAG2_BUTTON
 static uint32_t  sess_hold2_t0;                  // two-finger hold: when the count became 2
 static bool      sess_hold2_ref;                 // ... and whether the position reference has been taken
 static int16_t   sess_hold2_ax0, sess_hold2_ay0, sess_drift2;
+#endif
 static int16_t   sess_prev_ax, sess_prev_ay;     // finger 1 absolute on the previous frame (two-finger drag motion)
 static uint16_t  sess_lines;       // non-zero wheel lines emitted this session
 static uint8_t   prev_n, frames_since_change, zero_frames, fail_count;
@@ -298,8 +301,10 @@ static void tp_gesture(const tp_meas_data_t *md, report_mouse_t *report) {
         sess_replay_x = sess_replay_y = 0;
         sess_drag_btn  = POINTING_DEVICE_BUTTON1;
         sess_drag2     = false;
+#ifdef TP_DRAG2_BUTTON
         sess_hold2_ref = false;
         sess_drift2    = 0;
+#endif
         sess_prev_ax   = ax;
         sess_prev_ay   = ay;
 #ifdef TP_MEASURE_PRINT
@@ -370,6 +375,7 @@ static void tp_gesture(const tp_meas_data_t *md, report_mouse_t *report) {
                 sess_hold_dy += ry;
                 if (MAX(tp_abs16(ax - sess_arm_ax), tp_abs16(ay - sess_arm_ay)) > TP_DRAG_START_UNITS) {
                     sess_mode      = TP_DRAGGING; // button goes down with zero motion first
+                    sess_drag_btn  = POINTING_DEVICE_BUTTON8; // a drag level; the master picks the button from the modifiers held (build 14)
                     swallow_motion = true;
                     sess_replay_x  = sess_hold_dx;
                     sess_replay_y  = sess_hold_dy;

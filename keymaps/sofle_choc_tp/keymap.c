@@ -103,16 +103,20 @@ void keyboard_post_init_user(void) {
 #    error "tp_driver uses report_id as a split sequence number; MOUSE_SHARED_EP is required"
 #endif
 
-// Number of keys carrying Ctrl (KC_LCTL/KC_RCTL, LCTL(kc)-style, or a Ctrl
-// mod-tap such as the home-row LCTL_T(KC_F)) currently pressed. Only used to
-// decide whether to put Ctrl back after a Ctrl + two-finger drag (below).
-static int8_t tp_ctrl_keys_down = 0;
+// Number of keys carrying Ctrl ([0]) or Cmd/Super ([1]) currently pressed:
+// KC_LCTL/KC_RCTL/KC_LGUI/KC_RGUI, LCTL(kc)/LGUI(kc)-style keys, or a mod-tap
+// such as the home-row LCTL_T(KC_F). Only used to decide whether to put a
+// modifier back after a modifier + drag (below) once the button is up.
+static int8_t tp_mod_keys_down[2] = {0, 0};
 
-static bool tp_keycode_has_ctrl(uint16_t kc) {
-    if (kc == KC_LCTL || kc == KC_RCTL) return true;
-    if (IS_QK_MOD_TAP(kc)) return (QK_MOD_TAP_GET_MODS(kc) & MOD_LCTL) != 0; // 5-bit mods, bit 0 = Ctrl either hand
-    if (IS_QK_MODS(kc)) return (QK_MODS_GET_MODS(kc) & MOD_LCTL) != 0;
-    return false;
+// The 5-bit modifier set a keycode carries (bit 0 Ctrl, bit 3 GUI, either
+// hand), or 0 for a plain key.
+static uint8_t tp_keycode_mods(uint16_t kc) {
+    if (kc == KC_LCTL || kc == KC_RCTL) return MOD_LCTL;
+    if (kc == KC_LGUI || kc == KC_RGUI) return MOD_LGUI;
+    if (IS_QK_MOD_TAP(kc)) return QK_MOD_TAP_GET_MODS(kc);
+    if (IS_QK_MODS(kc)) return QK_MODS_GET_MODS(kc);
+    return 0;
 }
 
 report_mouse_t pointing_device_task_user(report_mouse_t mouse_report) {
@@ -168,48 +172,64 @@ report_mouse_t pointing_device_task_user(report_mouse_t mouse_report) {
         if (edges & 0x40) tap_code16(down);   // BUTTON7: fingers down
     }
     mouse_report.buttons &= (uint8_t)~0x78;
-#ifdef TP_DRAG2_BUTTON
-    // Two-finger drag (build 13). The pad half reports it as a BUTTON8 level
-    // (bit 7), because it knows nothing about modifiers; here it becomes
-    // TP_DRAG2_BUTTON (right), or TP_DRAG2_CTRL_BUTTON (middle: a middle-button
-    // drag as on a mouse, orbit/pan in CAD) when Ctrl is held at the moment the
-    // drag starts. The choice is latched for the whole drag. A hidden Ctrl:
-    // Ctrl+middle drag means something else in most CAD apps (zoom in Blender,
-    // pan in SolidWorks), and a Ctrl+left drag would not be a plain drag either
-    // (copy in file managers, links in new tabs), so the Ctrl bits are removed
-    // from the keyboard report before the button goes
-    // down and put back one tick after it comes up (after the mouse-up has
-    // gone out, so the release is not a Ctrl+click either) if a Ctrl key is
-    // still physically down (tp_ctrl_keys_down, counted in process_record_user).
+#if defined(TP_DRAG_GUI_BUTTON) || defined(TP_DRAG_CTRL_BUTTON)
+    // Modifier drags (build 14). The pad half reports every one-finger drag
+    // as a BUTTON8 level (bit 7), because it knows nothing about modifiers;
+    // here it becomes the left button, or TP_DRAG_GUI_BUTTON (right) when
+    // Cmd/Super is held at the moment the drag starts, or TP_DRAG_CTRL_BUTTON
+    // (middle: a middle-button drag as on a mouse, orbit/pan in CAD) when Ctrl
+    // is. The choice is latched for the whole drag. The chosen modifier is
+    // hidden: Ctrl+middle or Super+right drag mean something else in CAD apps
+    // and compositors (zoom in Blender, pan in SolidWorks, window moves in
+    // Niri), so its bits are removed from the keyboard report before the
+    // button goes down and put back one tick after it comes up (after the
+    // mouse-up has gone out, so the release is not a modified click either)
+    // if such a key is still physically down (tp_mod_keys_down, counted in
+    // process_record_user). Any other modifier held reaches the host as is.
     {
-        static bool    drag2_active = false, drag2_restore = false;
-        static uint8_t drag2_bit = 0, drag2_hidden = 0;
-        if (drag2_restore) {
-            drag2_restore = false;
-            if (tp_ctrl_keys_down > 0) {
-                add_mods(drag2_hidden);
+        static bool    drag_active = false, drag_restore = false;
+        static uint8_t drag_bit = 0, drag_hidden = 0, drag_hidden_kind = 0;
+        if (drag_restore) {
+            drag_restore = false;
+            if (tp_mod_keys_down[drag_hidden_kind] > 0) {
+                add_mods(drag_hidden);
                 send_keyboard_report();
             }
-            drag2_hidden = 0;
+            drag_hidden = 0;
         }
         bool level = mouse_report.buttons & 0x80;
-        if (level && !drag2_active) {
-            drag2_active = true;
-            drag2_hidden = get_mods() & MOD_MASK_CTRL;
-            if (drag2_hidden) {
-                drag2_bit = 1u << TP_DRAG2_CTRL_BUTTON;
-                del_mods(drag2_hidden);
-                send_keyboard_report(); // Ctrl up reaches the host before the button down
-            } else {
-                drag2_bit = 1u << TP_DRAG2_BUTTON;
+        if (level && !drag_active) {
+            drag_active = true;
+            uint8_t mods = get_mods();
+            drag_bit    = 1u << POINTING_DEVICE_BUTTON1;
+            drag_hidden = 0;
+#    ifdef TP_DRAG_GUI_BUTTON
+            if (mods & MOD_MASK_GUI) {
+                drag_bit         = 1u << TP_DRAG_GUI_BUTTON;
+                drag_hidden      = mods & MOD_MASK_GUI;
+                drag_hidden_kind = 1;
             }
-        } else if (!level && drag2_active) {
-            drag2_active  = false;
-            drag2_restore = drag2_hidden != 0;
+#    endif
+#    ifdef TP_DRAG_CTRL_BUTTON
+            if (!drag_hidden && (mods & MOD_MASK_CTRL)) {
+                drag_bit         = 1u << TP_DRAG_CTRL_BUTTON;
+                drag_hidden      = mods & MOD_MASK_CTRL;
+                drag_hidden_kind = 0;
+            }
+#    endif
+            if (drag_hidden) {
+                del_mods(drag_hidden);
+                send_keyboard_report(); // the modifier's release reaches the host before the button down
+            }
+        } else if (!level && drag_active) {
+            drag_active  = false;
+            drag_restore = drag_hidden != 0;
         }
         mouse_report.buttons &= 0x7F;
-        if (drag2_active) mouse_report.buttons |= drag2_bit;
+        if (drag_active) mouse_report.buttons |= drag_bit;
     }
+#else
+    mouse_report.buttons = (mouse_report.buttons & 0x7F) | ((mouse_report.buttons & 0x80) ? (1u << POINTING_DEVICE_BUTTON1) : 0);
 #endif
 #ifdef TP_DISCRETE_H_MODS
     {
@@ -319,12 +339,16 @@ const uint16_t PROGMEM encoder_map[][NUM_ENCODERS][2] = {
 // real arrow keys with Ctrl still move between Spaces. Ctrl is already held, so a
 // bare Tab (or Shift+Tab) completes Ctrl+Tab / Ctrl+Shift+Tab.
 bool process_record_user(uint16_t keycode, keyrecord_t *record) {
-#if defined(POINTING_DEVICE_ENABLE) && defined(TP_DRAG2_BUTTON)
-    if (!IS_ENCODEREVENT(record->event) && tp_keycode_has_ctrl(keycode)) {
-        if (record->event.pressed) {
-            if (tp_ctrl_keys_down < 127) tp_ctrl_keys_down++;
-        } else if (tp_ctrl_keys_down > 0) {
-            tp_ctrl_keys_down--;
+#if defined(POINTING_DEVICE_ENABLE) && (defined(TP_DRAG_GUI_BUTTON) || defined(TP_DRAG_CTRL_BUTTON))
+    if (!IS_ENCODEREVENT(record->event)) {
+        uint8_t mods = tp_keycode_mods(keycode);
+        for (uint8_t kind = 0; kind < 2; kind++) {
+            if (!(mods & (kind == 0 ? MOD_LCTL : MOD_LGUI))) continue;
+            if (record->event.pressed) {
+                if (tp_mod_keys_down[kind] < 127) tp_mod_keys_down[kind]++;
+            } else if (tp_mod_keys_down[kind] > 0) {
+                tp_mod_keys_down[kind]--;
+            }
         }
     }
 #endif

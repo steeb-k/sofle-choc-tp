@@ -106,8 +106,10 @@
 #define TP_HOLD_STILL_DRIFT  12    // units (~0.5 mm) a finger may move and still count as held still (resting: 5 in 250 ms)
 #define TP_DEAD_ZONE_UNITS   12    // no cursor motion until the touch has drifted this far
 #define TP_DRAG_START_UNITS  16    // ~0.7 mm of travel within a 200 ms window after arming starts the drag; resting creep stays below this
-#define TP_DRAG2_BUTTON      POINTING_DEVICE_BUTTON2 // build 13: two fingers held still for TP_HOLD_MS, then moved = drag with this button (right); comment out to disable the gesture
-#define TP_DRAG2_CTRL_BUTTON POINTING_DEVICE_BUTTON3 // ... and with Ctrl held when the drag starts: this button instead (middle: orbit/pan in CAD, like a middle-button drag on a mouse); Ctrl is hidden from the host for the drag. POINTING_DEVICE_BUTTON1 would give the macOS three-finger drag
+// #define TP_DRAG2_BUTTON      POINTING_DEVICE_BUTTON2 // build 13's two-finger hold-then-move drag, off since build 14: two resting fingers trip the chip's scroll gesture before the hold arms, so it only ever scrolled. The modifier drags below replace it.
+// #define TP_DRAG2_CTRL_BUTTON POINTING_DEVICE_BUTTON3
+#define TP_DRAG_GUI_BUTTON   POINTING_DEVICE_BUTTON2 // build 14: Cmd/Super held when a one-finger drag starts = a drag with this button (right); the modifier is hidden from the host for the drag. Comment out to drop it.
+#define TP_DRAG_CTRL_BUTTON  POINTING_DEVICE_BUTTON3 // ... Ctrl held = this button (middle: orbit/pan in CAD, like a mouse's middle button held while moving), Ctrl hidden likewise. Cmd/Super wins when both are held.
 #define TP_SCROLL_UNITS_PER_LINE 8  // units of finger travel per wheel line (~0.33 mm); try 4, 8, 12
 
 #define TP_SCROLL_BATCH_FRAMES 4   // one scroll report per 4 fresh frames (40 ms); see README
