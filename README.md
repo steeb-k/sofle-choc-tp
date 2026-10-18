@@ -102,6 +102,16 @@ Horizontal scroll flipped on macOS. The build 8 per-OS flip now has a macOS pair
 
 Baked layout refreshed. `keymaps[]` and `encoder_map[]` are the layout read from the board on 2026-10-16 (`layout/current_layout.json`; the 2026-10-11 dump is kept in `layout/backup-20261016/`). The two tap dances and two macros in that layout live in Vial's EEPROM only and are not baked.
 
+## Build 13
+
+Two-finger drag (`tp_driver.c`, `TP_DRAG2_BUTTON` in `config.h`). Rest two fingers still for `TP_HOLD_MS` (250 ms, counted from the moment the second finger lands), then move: the right button goes down where the fingers rested and stays down until all fingers lift. It mirrors the one-finger drag (same stillness limit `TP_HOLD_STILL_DRIFT`, same start threshold `TP_DRAG_START_UNITS` with the rolling 200 ms reference, same held-back-then-replayed start, same two-empty-frame release), with these differences:
+
+- It works from finger 1's absolute position, not the chip's relative deltas: the measurement log shows rel x/y is always zero for two fingers unless the chip's scroll gesture is running, so the deltas would vanish on a slow drag. The position reference for the stillness test is taken 2 frames after the count reaches 2, because finger 1 shifts as the second finger lands.
+- Once armed, the chip's scroll bit is ignored for the rest of the session, so moving two fingers after the hold drags instead of scrolling. Moving them right away still scrolls (the drift test, or a wheel line already sent, demotes the hold to plain pointing and nothing re-arms until the fingers lift). A two-finger tap is unchanged: the right click fires on a lift within `TP_MULTI_TAP_MAX_MS` whether or not the hold had armed. Two fingers resting longer than that and lifting do nothing.
+- During the drag one finger may lift (or slide off the 43 mm pad) and the drag continues with the other; the 2 frames after any count change are skipped because the chip renumbers the fingers, which jumps the absolute position. A third finger during the hold cancels it.
+- Ctrl + two-finger drag is a middle-button drag, the same as holding a mouse's middle button while moving it (orbit or pan in CAD applications; `TP_DRAG2_CTRL_BUTTON`). The pad half knows nothing about modifiers, so it reports the two-finger drag as a `BUTTON8` level and `pointing_device_task_user` in `keymap.c` maps it: Ctrl held at the moment the drag starts picks `TP_DRAG2_CTRL_BUTTON`, otherwise `TP_DRAG2_BUTTON`, latched for the whole drag (Ctrl can be released once the drag is under way). The Ctrl bits are removed from the keyboard report before the button goes down, so the host sees a plain middle drag and not Ctrl+middle (zoom in Blender, pan in SolidWorks, and a Ctrl+left drag would be a copy or a new tab), and are put back one tick after the button comes up, after the mouse-up has gone out, if a Ctrl key is still physically down (`process_record_user` counts pressed keys carrying Ctrl: `KC_LCTL`/`KC_RCTL`, `LCTL(kc)`, and Ctrl mod-taps such as the home-row `LCTL_T(KC_F)`). Only Ctrl is hidden: Shift or Alt held with it reach the host, so Shift + Ctrl + two-finger drag is a Shift+middle drag (pan in Fusion 360, Blender). Ctrl + two-finger tap is still a plain right click.
+- `TP_DRAG2_BUTTON` is `POINTING_DEVICE_BUTTON2` (right) and `TP_DRAG2_CTRL_BUTTON` is `POINTING_DEVICE_BUTTON3` (middle; `POINTING_DEVICE_BUTTON1` would give the macOS three-finger drag); comment out `TP_DRAG2_BUTTON` to remove the gesture on both halves. A second finger landing during a one-finger drag still leaves that drag alone. The measurement build prints `E arm2` / `E drag2_start` and the session modes `pending2` / `armed2`.
+
 ## Build 12
 
 Right-half RGB blink while the pad moves, and drags that start where the finger rested. Both on the pad half, in the firmware; nothing in EEPROM changes.
@@ -209,6 +219,8 @@ Note that the vendor keymap does not preserve EEPROM across builds, so flashing 
 - 20 deliberate taps all click.
 - Two-finger tap is a right click; three-finger tap is a middle click.
 - Press for a quarter second, then move: drag; release ends it.
+- Two fingers, rest a quarter second, then move: right-button drag (a context menu on release in most apps, a right-drag copy/move in a Finder/Windows Explorer window, orbit in Blender); release ends it. Two fingers moved right away still scroll; a two-finger tap still right-clicks.
+- Hold Ctrl (the home-row F or J, or the layer's Ctrl key), then the same two-finger drag: a middle-button drag, which orbits or pans in a CAD view and autoscrolls in a browser, exactly as a mouse's middle button held while moving; releasing Ctrl mid-drag changes nothing, and `tools/hid_watch.py` shows button 3 and no Ctrl while it is down. Keep Ctrl held after lifting: Ctrl is active again (the next key is a Ctrl chord). Shift + Ctrl + two-finger drag reaches the host as Shift+middle drag.
 - Slow careful pointing never starts a drag.
 - A finger resting for 10+ seconds never clicks or drags.
 - A tap does not nudge the cursor.

@@ -187,7 +187,10 @@ static void tp_retry_init(void) {
 #    define TP_SWIPE3_MAX_MS 700
 #endif
 
-typedef enum { TP_IDLE, TP_PENDING, TP_MOVING, TP_ARMED, TP_DRAGGING } tp_mode_t;
+// TP_PENDING2/TP_ARMED2 are the two-finger counterparts of TP_PENDING/TP_ARMED
+// (build 13); both drags share TP_DRAGGING and differ by sess_drag_btn (BUTTON1,
+// or BUTTON8 for the two-finger drag, which the master translates).
+typedef enum { TP_IDLE, TP_PENDING, TP_MOVING, TP_ARMED, TP_DRAGGING, TP_PENDING2, TP_ARMED2 } tp_mode_t;
 
 static bool      sess_active;
 static uint32_t  sess_t0;
@@ -197,6 +200,12 @@ static int16_t   sess_arm_ax, sess_arm_ay;
 static uint8_t   sess_arm_frames;  // frames since the rolling drag reference was set
 static int16_t   sess_hold_dx, sess_hold_dy;     // rel motion held back while armed (build 12)
 static int16_t   sess_replay_x, sess_replay_y;   // held-back motion still to be sent after drag start
+static uint8_t   sess_drag_btn;                  // button held while TP_DRAGGING (bit index)
+static bool      sess_drag2;                     // the current TP_DRAGGING is the two-finger kind
+static uint32_t  sess_hold2_t0;                  // two-finger hold: when the count became 2
+static bool      sess_hold2_ref;                 // ... and whether the position reference has been taken
+static int16_t   sess_hold2_ax0, sess_hold2_ay0, sess_drift2;
+static int16_t   sess_prev_ax, sess_prev_ay;     // finger 1 absolute on the previous frame (two-finger drag motion)
 static uint16_t  sess_lines;       // non-zero wheel lines emitted this session
 static uint8_t   prev_n, frames_since_change, zero_frames, fail_count;
 static uint16_t  sess_motion;
@@ -287,6 +296,12 @@ static void tp_gesture(const tp_meas_data_t *md, report_mouse_t *report) {
         acc_v = acc_h = 0;
         sess_hold_dx = sess_hold_dy = 0;
         sess_replay_x = sess_replay_y = 0;
+        sess_drag_btn  = POINTING_DEVICE_BUTTON1;
+        sess_drag2     = false;
+        sess_hold2_ref = false;
+        sess_drift2    = 0;
+        sess_prev_ax   = ax;
+        sess_prev_ay   = ay;
 #ifdef TP_MEASURE_PRINT
         if (tp_banner_pending) {
             tp_banner_due = true; // printed at the end of get_report
@@ -323,8 +338,12 @@ static void tp_gesture(const tp_meas_data_t *md, report_mouse_t *report) {
             int16_t d = MAX(tp_abs16(ax - sess_ax0), tp_abs16(ay - sess_ay0));
             if (d > sess_drift1) sess_drift1 = d;
         }
-        // Second finger during the single-finger states abandons them.
+        // Second finger during the single-finger states abandons them; a
+        // third does the same to the two-finger states.
         if (sess_maxf >= 2 && (sess_mode == TP_PENDING || sess_mode == TP_ARMED)) {
+            sess_mode = TP_MOVING;
+        }
+        if (sess_maxf >= 3 && (sess_mode == TP_PENDING2 || sess_mode == TP_ARMED2)) {
             sess_mode = TP_MOVING;
         }
         if (n == 1 && sess_maxf == 1) {
@@ -367,11 +386,86 @@ static void tp_gesture(const tp_meas_data_t *md, report_mouse_t *report) {
                 }
             }
         }
+#ifdef TP_DRAG2_BUTTON
+        // Two fingers (build 13): both held still for TP_HOLD_MS, then moved,
+        // is a drag holding TP_DRAG2_BUTTON (right by default). Mirrors the
+        // one-finger arm/drag above with one difference: the chip's rel x/y is
+        // zero for two fingers unless its scroll gesture is running (in
+        // measurements/2026-10-10-right-half-measure.log every f=2 frame
+        // without the scroll bit has x=y=0), so this path works from finger
+        // 1's absolute position throughout: stillness, the start threshold
+        // and the drag motion itself (see the motion block).
+        if (sess_maxf == 2 && sess_mode != TP_DRAGGING) {
+            if (n == 2 && frames_since_change == 0) {
+                // The count just became 2 (also after a 2-1-2 flicker): the
+                // hold starts now. The position reference is taken 2 frames
+                // later, when the landing has settled (finger 1 can shift as
+                // the second finger lands).
+                sess_mode      = TP_PENDING2;
+                sess_hold2_t0  = timer_read32();
+                sess_hold2_ref = false;
+                sess_drift2    = 0;
+            } else if (n != 2 && (sess_mode == TP_PENDING2 || sess_mode == TP_ARMED2)) {
+                sess_mode = TP_MOVING; // a finger lifted before the drag started: plain pointing
+            }
+            if ((sess_mode == TP_PENDING2 || sess_mode == TP_ARMED2) && frames_since_change >= 2) {
+                if (!sess_hold2_ref) {
+                    sess_hold2_ref = true;
+                    sess_hold2_ax0 = ax;
+                    sess_hold2_ay0 = ay;
+                }
+                int16_t d = MAX(tp_abs16(ax - sess_hold2_ax0), tp_abs16(ay - sess_hold2_ay0));
+                if (d > sess_drift2) sess_drift2 = d;
+                if (sess_mode == TP_PENDING2) {
+                    if (sess_drift2 > TP_HOLD_STILL_DRIFT || sess_lines != 0 || pend_v != 0 || pend_h != 0) {
+                        sess_mode = TP_MOVING; // moved or scrolled: no drag this session
+                    } else if (timer_elapsed32(sess_hold2_t0) >= TP_HOLD_MS) {
+                        sess_mode       = TP_ARMED2;
+                        sess_arm_ax     = ax;
+                        sess_arm_ay     = ay;
+                        sess_arm_frames = 0;
+                        TP_EV("arm2");
+                    }
+                } else if (MAX(tp_abs16(ax - sess_arm_ax), tp_abs16(ay - sess_arm_ay)) > TP_DRAG_START_UNITS) {
+                    // Button down with zero motion first; the travel since the
+                    // arm reference is replayed over the following frames. The
+                    // drag is reported as a BUTTON8 level: this half knows no
+                    // modifier state, so the master maps it to TP_DRAG2_BUTTON
+                    // (right), or to TP_DRAG2_CTRL_BUTTON (middle) when Ctrl is
+                    // held (keymap.c).
+                    sess_mode      = TP_DRAGGING;
+                    sess_drag_btn  = POINTING_DEVICE_BUTTON8;
+                    sess_drag2     = true;
+                    swallow_motion = true;
+                    sess_replay_x  = ax - sess_arm_ax;
+                    sess_replay_y  = ay - sess_arm_ay;
+                    TP_EV("drag2_start");
+                } else if (++sess_arm_frames >= 20) {
+                    sess_arm_ax     = ax; // rolling reference, as for one finger
+                    sess_arm_ay     = ay;
+                    sess_arm_frames = 0;
+                }
+            }
+        }
+#endif
     }
 
-    // Cursor motion: one finger only, not while scrolling.
-    bool dead_zone = sess_active && ((sess_mode == TP_PENDING && sess_drift1 <= TP_DEAD_ZONE_UNITS) || sess_mode == TP_ARMED);
-    if (n == 1 && !scroll && !swallow_motion && !twitch && !dead_zone) {
+    // Cursor motion: one finger only, not while scrolling. A two-finger drag
+    // (drag2) is the exception: it moves with one or two fingers, from finger
+    // 1's absolute deltas, and skips the 2 frames after a count change (the
+    // chip renumbers the fingers when one lifts, which jumps the absolute).
+    bool drag2     = sess_mode == TP_DRAGGING && sess_drag2;
+    bool dead_zone = sess_active && ((sess_mode == TP_PENDING && sess_drift1 <= TP_DEAD_ZONE_UNITS) || sess_mode == TP_ARMED || sess_mode == TP_ARMED2);
+    if (drag2) {
+        if (n >= 1 && n <= 2 && !swallow_motion && frames_since_change >= 2) {
+            int32_t ox = (int32_t)(ax - sess_prev_ax) + sess_replay_x;
+            int32_t oy = (int32_t)(ay - sess_prev_ay) + sess_replay_y;
+            report->x     = CONSTRAIN_HID_XY(ox);
+            report->y     = CONSTRAIN_HID_XY(oy);
+            sess_replay_x = (int16_t)(ox - report->x);
+            sess_replay_y = (int16_t)(oy - report->y);
+        }
+    } else if (n == 1 && !scroll && !swallow_motion && !twitch && !dead_zone) {
         int16_t ox = rx, oy = ry;
         if (sess_mode == TP_DRAGGING) {
             // Replay the motion held back while armed; what does not fit the
@@ -387,8 +481,13 @@ static void tp_gesture(const tp_meas_data_t *md, report_mouse_t *report) {
             report->y = CONSTRAIN_HID_XY(oy);
         }
     }
-    // Scroll: exactly two fingers; three or more suppress it for the session.
-    if (sess_active && scroll && n == 2 && sess_maxf < 3) {
+    if (n > 0) {
+        sess_prev_ax = ax;
+        sess_prev_ay = ay;
+    }
+    // Scroll: exactly two fingers; three or more suppress it for the session,
+    // and so do an armed two-finger hold and a two-finger drag.
+    if (sess_active && scroll && n == 2 && sess_maxf < 3 && sess_mode != TP_ARMED2 && !drag2) {
         tp_pend_add(&pend_v, tp_scroll_axis(&acc_v, ry));
         tp_pend_add(&pend_h, tp_scroll_axis(&acc_h, rx));
     }
@@ -462,7 +561,7 @@ static void tp_gesture(const tp_meas_data_t *md, report_mouse_t *report) {
             TP_EV("click3");
         } // maxf == 1 && ARMED: a resting finger, no click
 #ifdef TP_MEASURE_PRINT
-        static const char *const mode_names[] = {"idle", "pending", "moving", "armed", "drag"};
+        static const char *const mode_names[] = {"idle", "pending", "moving", "armed", "drag", "pending2", "armed2"};
         uprintf("S dur=%u maxf=%u motion=%u drift=%d scr=%u mode=%s\n", (unsigned)elapsed, (unsigned)sess_maxf, (unsigned)sess_motion, (int)sess_drift1, (unsigned)sess_scroll_seen, mode_names[sess_mode]);
 #endif
         tp_scroll_flush(report); // do not lose the tail
@@ -476,7 +575,7 @@ static void tp_gesture(const tp_meas_data_t *md, report_mouse_t *report) {
 
     uint8_t buttons = 0;
     if (sess_mode == TP_DRAGGING) {
-        buttons = pointing_device_handle_buttons(buttons, true, POINTING_DEVICE_BUTTON1);
+        buttons = pointing_device_handle_buttons(buttons, true, (pointing_device_buttons_t)sess_drag_btn);
     }
     if (click_frames_left > 0) {
         buttons = pointing_device_handle_buttons(buttons, true, (pointing_device_buttons_t)click_btn);

@@ -103,6 +103,18 @@ void keyboard_post_init_user(void) {
 #    error "tp_driver uses report_id as a split sequence number; MOUSE_SHARED_EP is required"
 #endif
 
+// Number of keys carrying Ctrl (KC_LCTL/KC_RCTL, LCTL(kc)-style, or a Ctrl
+// mod-tap such as the home-row LCTL_T(KC_F)) currently pressed. Only used to
+// decide whether to put Ctrl back after a Ctrl + two-finger drag (below).
+static int8_t tp_ctrl_keys_down = 0;
+
+static bool tp_keycode_has_ctrl(uint16_t kc) {
+    if (kc == KC_LCTL || kc == KC_RCTL) return true;
+    if (IS_QK_MOD_TAP(kc)) return (QK_MOD_TAP_GET_MODS(kc) & MOD_LCTL) != 0; // 5-bit mods, bit 0 = Ctrl either hand
+    if (IS_QK_MODS(kc)) return (QK_MODS_GET_MODS(kc) & MOD_LCTL) != 0;
+    return false;
+}
+
 report_mouse_t pointing_device_task_user(report_mouse_t mouse_report) {
 #ifdef TP_SEQ_DEDUP
     static uint8_t last_seq = 0;
@@ -156,6 +168,49 @@ report_mouse_t pointing_device_task_user(report_mouse_t mouse_report) {
         if (edges & 0x40) tap_code16(down);   // BUTTON7: fingers down
     }
     mouse_report.buttons &= (uint8_t)~0x78;
+#ifdef TP_DRAG2_BUTTON
+    // Two-finger drag (build 13). The pad half reports it as a BUTTON8 level
+    // (bit 7), because it knows nothing about modifiers; here it becomes
+    // TP_DRAG2_BUTTON (right), or TP_DRAG2_CTRL_BUTTON (middle: a middle-button
+    // drag as on a mouse, orbit/pan in CAD) when Ctrl is held at the moment the
+    // drag starts. The choice is latched for the whole drag. A hidden Ctrl:
+    // Ctrl+middle drag means something else in most CAD apps (zoom in Blender,
+    // pan in SolidWorks), and a Ctrl+left drag would not be a plain drag either
+    // (copy in file managers, links in new tabs), so the Ctrl bits are removed
+    // from the keyboard report before the button goes
+    // down and put back one tick after it comes up (after the mouse-up has
+    // gone out, so the release is not a Ctrl+click either) if a Ctrl key is
+    // still physically down (tp_ctrl_keys_down, counted in process_record_user).
+    {
+        static bool    drag2_active = false, drag2_restore = false;
+        static uint8_t drag2_bit = 0, drag2_hidden = 0;
+        if (drag2_restore) {
+            drag2_restore = false;
+            if (tp_ctrl_keys_down > 0) {
+                add_mods(drag2_hidden);
+                send_keyboard_report();
+            }
+            drag2_hidden = 0;
+        }
+        bool level = mouse_report.buttons & 0x80;
+        if (level && !drag2_active) {
+            drag2_active = true;
+            drag2_hidden = get_mods() & MOD_MASK_CTRL;
+            if (drag2_hidden) {
+                drag2_bit = 1u << TP_DRAG2_CTRL_BUTTON;
+                del_mods(drag2_hidden);
+                send_keyboard_report(); // Ctrl up reaches the host before the button down
+            } else {
+                drag2_bit = 1u << TP_DRAG2_BUTTON;
+            }
+        } else if (!level && drag2_active) {
+            drag2_active  = false;
+            drag2_restore = drag2_hidden != 0;
+        }
+        mouse_report.buttons &= 0x7F;
+        if (drag2_active) mouse_report.buttons |= drag2_bit;
+    }
+#endif
 #ifdef TP_DISCRETE_H_MODS
     {
         static uint16_t last_h_time = 0, last_v_time = 0;
@@ -264,6 +319,15 @@ const uint16_t PROGMEM encoder_map[][NUM_ENCODERS][2] = {
 // real arrow keys with Ctrl still move between Spaces. Ctrl is already held, so a
 // bare Tab (or Shift+Tab) completes Ctrl+Tab / Ctrl+Shift+Tab.
 bool process_record_user(uint16_t keycode, keyrecord_t *record) {
+#if defined(POINTING_DEVICE_ENABLE) && defined(TP_DRAG2_BUTTON)
+    if (!IS_ENCODEREVENT(record->event) && tp_keycode_has_ctrl(keycode)) {
+        if (record->event.pressed) {
+            if (tp_ctrl_keys_down < 127) tp_ctrl_keys_down++;
+        } else if (tp_ctrl_keys_down > 0) {
+            tp_ctrl_keys_down--;
+        }
+    }
+#endif
     if (IS_ENCODEREVENT(record->event) && record->event.pressed && (get_mods() & MOD_MASK_CTRL) && (keycode == KC_LEFT || keycode == KC_RGHT)) {
         if (keycode == KC_LEFT) {
             register_code(KC_LSFT);
